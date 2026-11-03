@@ -87,7 +87,7 @@ const fmt = ms => { const t=Math.max(0,ms),m=Math.floor(t/60000),s=Math.floor(t%
 const elapsed = () => S.startTs ? (S.stopTs || sNow()) - S.startTs : 0;
 const running = () => S.startTs && !S.stopTs;
 let gRef; let pt = null;
-function push(){ clearTimeout(pt); pt = setTimeout(() => set(gRef, JSON.parse(JSON.stringify(S))).catch(console.error), 80); }
+function push(){ clearTimeout(pt); pt = setTimeout(() => set(gRef, JSON.parse(JSON.stringify(S))).catch(e => { $('#conn').textContent = 'ПОМИЛКА ЗАПИСУ'; $('#conn').className = 'offl'; alert('Запис не вдався: ' + e.code + '. Перевір Rules для race/'); }), 80); }
 
 function buildBar(){
   const bar = $('#bar'); bar.innerHTML = '';
@@ -105,7 +105,7 @@ function connect(){
           : { cfg:{...DEF}, runners:[], laps:[], fin:[], startTs:0, stopTs:0 };
     if (first) { first = false; fillInputs(); }
     renderList();
-  });
+  }, err => { $('#conn').textContent = 'НЕМАЄ ДОСТУПУ'; $('#conn').className = 'offl'; alert('Firebase: ' + err.code + '. Перевір Rules для race/'); });
 }
 function fillInputs(){
   Object.keys(DEF).forEach(k => { const e = $('#' + k); if (!e || e.type === 'file') return;
