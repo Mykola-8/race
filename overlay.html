@@ -28,8 +28,8 @@ html,body{margin:0;width:1920px;height:1080px;background:transparent;overflow:hi
 .avg{background:var(--acc);color:#111;padding:8px 14px;border-radius:0 0 8px 8px;animation:sIn .6s both}
 .avg .big{font-size:38px}
 </style></head><body>
-<div class="box off" id="L"><div class="hd"><img id="lg"><span id="tt"></span><span class="cl" id="cl"></span></div><div class="rows" id="rows"></div></div>
-<div class="box off" id="R"><div class="hd"><span>ЧАС</span><span class="cl" id="lapn"></span></div>
+<div class="box" id="L"><div class="hd"><img id="lg"><span id="tt"></span><span class="cl" id="cl"></span></div><div class="rows" id="rows"></div></div>
+<div class="box" id="R"><div class="hd"><span>ЧАС</span><span class="cl" id="lapn"></span></div>
  <div class="rp"><div class="big" id="tm">0:00.00</div><div class="sm"><span>Останнє коло</span><b id="ll">—</b></div></div><div id="avgw"></div></div>
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
@@ -59,6 +59,11 @@ onValue(ref(db, 'race/track' + rid), snap => {
   const d = snap.val() || {};
   S = { cfg: d.cfg || {}, runners: d.runners || [], laps: d.laps || [], fin: d.fin || [], startTs: d.startTs || 0, stopTs: d.stopTs || 0 };
   render();
+}, err => {
+  const e = document.createElement('div');
+  e.style.cssText = 'position:absolute;top:20px;left:20px;background:#c0392b;color:#fff;padding:10px 16px;font:700 22px Inter,sans-serif;border-radius:8px';
+  e.textContent = 'Firebase: ' + err.code + ' — перевір Rules для race/';
+  document.body.appendChild(e);
 });
 function render(){
   const c = Object.assign({dist:10000,lap:400,scaleL:1,scaleR:1,lx:40,ly:40,rx:40,ry:40,showL:true,showR:true,bg:'#1b2a6b',acc:'#f5a623',title:'',club:'',logo:''}, S.cfg);
