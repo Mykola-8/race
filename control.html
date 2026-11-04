@@ -59,6 +59,22 @@ input[type=color]{height:40px;padding:2px}input[type=range]{padding:0}
   <div class="g2"><div><label>Фон</label><input id="bg" type="color"></div><div><label>Акцент</label><input id="acc" type="color"></div></div>
   <label>Логотип</label><input id="logo" type="file" accept="image/*">
   <button class="small" id="nologo" style="margin-top:6px">Прибрати логотип</button>
+  <p class="ttl" style="margin-top:16px">Рухомий логотип (по всьому екрану)</p>
+  <p style="font-size:11px;opacity:.5;margin:0">Розмір 0 = приховано. За замовчуванням стоїть знизу посередині. <b id="flSt"></b></p>
+  <div class="g2" style="margin:6px 0"><button class="small" id="flUp">🖼 Завантажити лого</button><button class="small" id="flDel">✕ Видалити</button></div>
+  <input type="file" id="flLogo" hidden accept="image/*">
+  <label>Горизонталь (%): <b id="v_flX"></b></label><input type="range" id="flX" min="0" max="100" step="0.5"><label>Вертикаль (%): <b id="v_flY"></b></label><input type="range" id="flY" min="0" max="100" step="0.5"><label>Розмір (0 = сховати): <b id="v_flScale"></b></label><input type="range" id="flScale" min="0" max="3" step="0.05">
+  <div class="g2"><div><label>Колір фону</label><input id="flBg" type="color"></div><div><label>Прозорість фону (0 = без фону): <b id="v_flBgA"></b></label><input type="range" id="flBgA" min="0" max="100" step="1"></div></div>
+  <p class="ttl" style="margin-top:16px">Талісман (відео по центру)</p>
+  <p style="font-size:11px;opacity:.5;margin:0">Коротке відео без звуку, до 3 МБ, на однотонному фоні (зелений тощо). Більше відео — поклади файл у репозиторій і вкажи шлях нижче. <b id="mvSt"></b></p>
+  <div class="g2" style="margin:6px 0"><button class="small" id="mvUp">🎬 Завантажити відео</button><button class="small" id="mvDel">✕ Видалити</button></div>
+  <input type="file" id="mvFile" hidden accept="video/*">
+  <label>Або шлях/URL відео (наприклад mascot.webm)</label><input id="vUrl" placeholder="mascot.webm">
+  <label>Горизонталь (%): <b id="v_vX"></b></label><input type="range" id="vX" min="0" max="100" step="0.5"><label>Вертикаль (%): <b id="v_vY"></b></label><input type="range" id="vY" min="0" max="100" step="0.5"><label>Розмір (0 = сховати): <b id="v_vScale"></b></label><input type="range" id="vScale" min="0" max="3" step="0.05">
+  <div class="sw"><span>Видаляти фон (chroma key)</span><input type="checkbox" id="vChroma"></div>
+  <div class="sw"><span>Колір фону авто (лівий верхній піксель)</span><input type="checkbox" id="vAuto"></div>
+  <label>Колір фону вручну</label><input id="vKey" type="color">
+  <label>Допуск кольору: <b id="v_vTol"></b></label><input type="range" id="vTol" min="0" max="100" step="1"><label>М’якість краю: <b id="v_vSoft"></b></label><input type="range" id="vSoft" min="0" max="100" step="1">
   <p class="ttl" style="margin-top:16px">Учасники (номер;імʼя;країна — по рядку)</p>
   <textarea id="ppl" rows="9" placeholder="25;MYHRE;no&#10;24;KIMELI;be&#10;21;GRESSIER;fr"></textarea>
   <div class="g2" style="margin-top:8px"><button class="small" id="ap">Застосувати список</button><button class="small" id="csv">Завантажити CSV/TXT</button></div>
@@ -88,12 +104,12 @@ const TOTAL = 4, $ = q => document.querySelector(q);
 let rid = parseInt(new URLSearchParams(location.search).get('race')) || 1; if (rid < 1 || rid > TOTAL) rid = 1;
 let off = 0; onValue(ref(db, '.info/serverTimeOffset'), s => off = s.val() || 0);
 const sNow = () => Date.now() + off;
-const DEF = {dist:10000,lap:400,scaleL:1,scaleR:1,lx:40,ly:40,rx:40,ry:40,firstSeg:0,showL:true,showR:true,showFlags:true,bg:'#1b2a6b',acc:'#f5a623',title:'10000M FINAL',club:'',logo:''};
+const DEF = {dist:10000,lap:400,scaleL:1,scaleR:1,lx:40,ly:40,rx:40,ry:40,firstSeg:0,showL:true,showR:true,flX:50,flY:92,flScale:1,flBg:'#000000',flBgA:0,vX:50,vY:50,vScale:1,vChroma:true,vAuto:true,vKey:'#00ff00',vTol:40,vSoft:20,vUrl:'',showFlags:true,bg:'#1b2a6b',acc:'#f5a623',title:'10000M FINAL',club:'',logo:''};
 let S = {cfg:{...DEF}, runners:[], laps:[], fin:[], pos:[], startTs:0, stopTs:0}, unsub = null, first = true;
 const fmt = ms => { const t=Math.max(0,ms),m=Math.floor(t/60000),s=Math.floor(t%60000/1000),c=Math.floor(t%1000/10); return m+':'+String(s).padStart(2,'0')+'.'+String(c).padStart(2,'0') };
 const elapsed = () => S.startTs ? (S.stopTs || sNow()) - S.startTs : 0;
 const running = () => S.startTs && !S.stopTs;
-let gRef; let pt = null;
+let gRef, unsubM = null; let pt = null;
 function push(){ clearTimeout(pt); pt = setTimeout(() => set(gRef, JSON.parse(JSON.stringify(S))).catch(e => { $('#conn').textContent = 'ПОМИЛКА ЗАПИСУ'; $('#conn').className = 'offl'; alert('Запис не вдався: ' + e.code + '. Перевір Rules для race/'); }), 80); }
 
 function buildBar(){
@@ -106,6 +122,9 @@ onValue(ref(db, '.info/connected'), s => { const e = $('#conn'); e.textContent =
 function connect(){
   if (unsub) unsub(); first = true; $('#rn').textContent = rid;
   gRef = ref(db, 'race/track' + rid);
+  if (unsubM) unsubM();
+  unsubM = onValue(ref(db, 'race/media' + rid + '/meta'), s => { const m = s.val() || {};
+    $('#flSt').textContent = m.logo ? '✓ лого завантажено' : ''; $('#mvSt').textContent = m.video ? '✓ відео ' + Math.round(m.video / 1024) + ' КБ' : ''; });
   unsub = onValue(gRef, snap => {
     const d = snap.val();
     S = d ? { cfg:{...DEF, ...(d.cfg||{})}, runners:d.runners||[], laps:d.laps||[], fin:d.fin||[], pos:d.pos||[], startTs:d.startTs||0, stopTs:d.stopTs||0 }
@@ -117,12 +136,12 @@ function connect(){
 function fillInputs(){
   Object.keys(DEF).forEach(k => { const e = $('#' + k); if (!e || e.type === 'file') return;
     if (e.type === 'checkbox') e.checked = !!S.cfg[k]; else e.value = S.cfg[k]; });
-  $('#v_scaleL').textContent = S.cfg.scaleL; $('#v_scaleR').textContent = S.cfg.scaleR;
+  document.querySelectorAll('[id^=v_]').forEach(s => s.textContent = S.cfg[s.id.slice(2)]);
   syncTa(); renderRL();
 }
 Object.keys(DEF).forEach(k => { const e = $('#' + k); if (!e || e.type === 'file') return;
   e.oninput = () => { S.cfg[k] = e.type === 'checkbox' ? e.checked : (e.type === 'number' || e.type === 'range') ? +e.value : e.value;
-    if (k === 'scaleL' || k === 'scaleR') $('#v_' + k).textContent = e.value; push(); }; });
+    const vv = $('#v_' + k); if (vv) vv.textContent = e.value; push(); }; });
 $('#logo').onchange = e => { const f = e.target.files[0]; if (!f) return; const img = new Image(), u = URL.createObjectURL(f);
   img.onload = () => { const m = 256, r = Math.min(1, m / Math.max(img.width, img.height)), c = document.createElement('canvas');
     c.width = img.width * r; c.height = img.height * r; c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
@@ -187,5 +206,20 @@ function renderList(){
   $('#info').textContent = 'Пробігли ' + cov + ' / ' + S.cfg.dist + ' м · Натискань ' + n + ' · Фінішувало ' + S.fin.length + ' / ' + S.runners.length;
 }
 (function tick(){ $('#clock').textContent = fmt(elapsed()); requestAnimationFrame(tick); })();
+const mp = p => ref(db, 'race/media' + rid + '/' + p);
+$('#flUp').onclick = () => $('#flLogo').click();
+$('#flLogo').onchange = e => { const f = e.target.files[0]; if (!f) return; const img = new Image();
+  img.onload = () => { const k = Math.min(1, 512 / Math.max(img.width, img.height)), cv = document.createElement('canvas'); cv.width = img.width * k; cv.height = img.height * k;
+    cv.getContext('2d').drawImage(img, 0, 0, cv.width, cv.height);
+    set(mp('logo'), cv.toDataURL('image/png')).then(() => set(mp('meta/logo'), true)).catch(er => alert('Не вдалося: ' + er.code)); };
+  img.src = URL.createObjectURL(f); e.target.value = ''; };
+$('#flDel').onclick = () => { set(mp('logo'), null); set(mp('meta/logo'), null); };
+$('#mvUp').onclick = () => $('#mvFile').click();
+$('#mvFile').onchange = e => { const f = e.target.files[0]; e.target.value = ''; if (!f) return;
+  if (f.size > 3.5 * 1024 * 1024) { alert('Файл завеликий (' + (f.size / 1048576).toFixed(1) + ' МБ). Максимум 3.5 МБ — стисни відео або вкажи URL/шлях до файлу в репозиторії.'); return; }
+  $('#mvSt').textContent = 'завантаження…'; const r = new FileReader();
+  r.onload = () => set(mp('video'), r.result).then(() => set(mp('meta/video'), f.size)).catch(er => alert('Не вдалося: ' + er.code));
+  r.readAsDataURL(f); };
+$('#mvDel').onclick = () => { set(mp('video'), null); set(mp('meta/video'), null); };
 buildBar(); connect();
 </script></body></html>
