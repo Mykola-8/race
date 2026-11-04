@@ -10,82 +10,51 @@ body{margin:0;background:var(--bg);color:#fff;font-family:Inter,sans-serif;min-h
 #bar{background:#111114;border-bottom:1px solid var(--bd);padding:10px 12px;display:flex;gap:8px;align-items:center;overflow-x:auto;position:sticky;top:0;z-index:10}
 .chip{flex-shrink:0;padding:7px 14px;border-radius:20px;border:1px solid var(--bd);background:transparent;color:rgba(255,255,255,.5);font:900 12px Inter;cursor:pointer}
 .chip.active{background:var(--blue);color:#fff;border-color:var(--blue)}
-#conn{margin-left:auto;font-size:10px;padding:3px 8px;border-radius:10px;font-weight:900}
+#conn{margin-left:auto;font-size:10px;padding:3px 8px;border-radius:10px;font-weight:900;white-space:nowrap}
 #conn.on{background:rgba(46,204,113,.2);color:var(--green)}#conn.offl{background:rgba(231,76,60,.2);color:var(--red)}
 main{padding:14px;display:flex;flex-direction:column;gap:12px;max-width:640px;margin:auto}
 .card{background:var(--sf);border:1px solid var(--bd);border-radius:16px;padding:14px}
 .ttl{font-size:10px;font-weight:900;letter-spacing:2px;color:rgba(255,255,255,.35);text-transform:uppercase;margin:0 0 8px}
+.hint{font-size:11px;opacity:.5;margin:4px 0}
 #clock{font:700 56px Oswald;text-align:center;font-variant-numeric:tabular-nums}
 #info{text-align:center;font-size:12px;opacity:.6;margin-bottom:8px}
-.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px}.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
 button.b{border:0;border-radius:14px;color:#fff;font:700 22px Oswald;text-transform:uppercase;height:72px;cursor:pointer}
 button.b:active{transform:scale(.95)}
 .go{background:linear-gradient(135deg,#16a34a,#15803d)}.stp{background:linear-gradient(135deg,#dc2626,#b91c1c)}
 .lp{background:linear-gradient(135deg,#0055ff,#003dd1)}.gr{background:#444}
-.rn{width:100%;display:flex;gap:10px;align-items:center;text-align:left;background:rgba(255,255,255,.06);border:0;border-radius:12px;color:#fff;font:700 18px Oswald;padding:14px;margin-bottom:6px;cursor:pointer}
-.rn.done{background:#15803d}.rn .t{margin-left:auto;font-family:Inter;font-size:14px}
-.rn:active{transform:scale(.97)}
+.rn{width:100%;display:flex;gap:10px;align-items:center;text-align:left;background:rgba(255,255,255,.06);border:0;border-radius:12px;color:#fff;font:700 18px Oswald;padding:14px;cursor:pointer}
+.rn.done{background:#15803d}.rn .t{margin-left:auto;font-family:Inter;font-size:14px}.rn:active{transform:scale(.97)}
 .rw{display:flex;gap:6px;margin-bottom:6px}.rw .rn{margin:0;flex:1}
 .mvb{width:52px;border:0;border-radius:12px;background:#2b3350;color:#fff;font:900 20px Inter;cursor:pointer}.mvb:active{background:#0055ff}
-label{display:block;font-size:11px;opacity:.6;margin:10px 0 4px}
+label{display:block;font-size:11px;opacity:.6;margin:10px 0 2px}
 input,textarea{width:100%;background:#0e1016;color:#fff;border:1px solid #333;border-radius:8px;padding:10px;font:600 14px Inter}
-input[type=color]{height:40px;padding:2px}input[type=range]{padding:0}
+input[type=color]{height:40px;padding:2px}
+input[type=checkbox]{width:26px;height:26px}
+input[type=range]{-webkit-appearance:none;appearance:none;height:46px;background:transparent;padding:0;border:0;margin:0}
+input[type=range]::-webkit-slider-runnable-track{height:12px;background:#3a4366;border-radius:6px}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:38px;height:38px;border-radius:50%;background:#0055ff;border:4px solid #fff;margin-top:-13px}
+input[type=range]::-moz-range-track{height:12px;background:#3a4366;border-radius:6px}
+input[type=range]::-moz-range-thumb{width:30px;height:30px;border-radius:50%;background:#0055ff;border:4px solid #fff}
 .sw{display:flex;justify-content:space-between;align-items:center;padding:8px 0}
-.small{padding:11px;font:900 12px Inter;border-radius:10px;border:0;background:#2b3350;color:#fff;cursor:pointer;width:100%}
-#set{display:none}#set.open{display:block}
+.small{padding:12px;font:900 12px Inter;border-radius:10px;border:0;background:#2b3350;color:#fff;cursor:pointer;width:100%}
+.small.on{background:var(--blue)}
+details.sec{background:var(--sf);border:1px solid var(--bd);border-radius:14px;margin-bottom:8px}
+details.sec>summary{cursor:pointer;padding:15px 14px;font:900 13px Inter;letter-spacing:1px;text-transform:uppercase;list-style:none;display:flex;justify-content:space-between}
+details.sec>summary::-webkit-details-marker{display:none}
+details.sec>summary::after{content:'▾';opacity:.5}details.sec[open]>summary::after{content:'▴'}
+details.sec>div{padding:0 14px 14px}
 </style></head><body>
 <div id="bar"></div><span id="conn" class="offl" style="display:none"></span>
 <main>
  <div class="card"><div id="clock">0:00.00</div><div id="info"></div>
   <div class="g2"><button class="b go" id="bs">▶ Старт</button><button class="b stp" id="bx">■ Стоп</button>
   <button class="b lp" id="bl">⏱ Коло</button><button class="b gr" id="bu">↩ Відмінити</button></div></div>
+ <div class="card"><p class="ttl">Табло на екрані</p>
+  <div class="g3"><button class="small" id="bdR">🏁 Результати</button><button class="small" id="bdC">👥 Клуби</button><button class="small" id="bdX">✕ Сховати</button></div>
+  <button class="small" id="exp" style="margin-top:8px">⬇ Завантажити результати (CSV)</button></div>
  <div class="card"><p class="ttl">Позиції: ▲ перегнав · ▼ програв · ⇅ вказати місце. Фініш — тисни імʼя</p><div id="rl"></div></div>
- <button class="small" id="tg">⚙ НАЛАШТУВАННЯ</button>
- <div id="set" class="card">
-  <p class="ttl">Плашки</p>
-  <div class="sw"><span>Ліва (учасники)</span><input type="checkbox" id="showL"></div>
-  <div class="sw"><span>Права (час)</span><input type="checkbox" id="showR"></div>
-  <label>Розмір лівої: <b id="v_scaleL"></b></label><input type="range" id="scaleL" min=".4" max="2.5" step=".05">
-  <label>Розмір правої: <b id="v_scaleR"></b></label><input type="range" id="scaleR" min=".4" max="2.5" step=".05">
-  <label>Ліва: відступ зліва (px)</label><input type="range" id="lx" min="0" max="1200" step="5">
-  <label>Ліва: відступ знизу (px)</label><input type="range" id="ly" min="0" max="900" step="5">
-  <label>Права: відступ справа (px)</label><input type="range" id="rx" min="0" max="1200" step="5">
-  <label>Права: відступ знизу (px)</label><input type="range" id="ry" min="0" max="900" step="5">
-  <p class="ttl" style="margin-top:16px">Забіг</p>
-  <label>Назва</label><input id="title"><label>Клуб / організація</label><input id="club">
-  <label>Дистанція (м)</label><input id="dist" type="number"><label>Довжина кола (м)</label><input id="lap" type="number">
-  <label>Перший відрізок до першого натискання «Коло» (м, 0 = повне коло)</label><input id="firstSeg" type="number">
-  <div class="g2" style="margin-top:6px"><button class="small" id="fs0">Повне коло</button><button class="small" id="fs200">Старт з пів кола (200 м)</button></div>
-  <div class="g2"><div><label>Фон</label><input id="bg" type="color"></div><div><label>Акцент</label><input id="acc" type="color"></div></div>
-  <label>Логотип</label><input id="logo" type="file" accept="image/*">
-  <button class="small" id="nologo" style="margin-top:6px">Прибрати логотип</button>
-  <p class="ttl" style="margin-top:16px">Рухомий логотип (по всьому екрану)</p>
-  <p style="font-size:11px;opacity:.5;margin:0">Розмір 0 = приховано. За замовчуванням стоїть знизу посередині. <b id="flSt"></b></p>
-  <div class="g2" style="margin:6px 0"><button class="small" id="flUp">🖼 Завантажити лого</button><button class="small" id="flDel">✕ Видалити</button></div>
-  <input type="file" id="flLogo" hidden accept="image/*">
-  <label>Горизонталь (%): <b id="v_flX"></b></label><input type="range" id="flX" min="0" max="100" step="0.5"><label>Вертикаль (%): <b id="v_flY"></b></label><input type="range" id="flY" min="0" max="100" step="0.5"><label>Розмір (0 = сховати): <b id="v_flScale"></b></label><input type="range" id="flScale" min="0" max="3" step="0.05">
-  <div class="g2"><div><label>Колір фону</label><input id="flBg" type="color"></div><div><label>Прозорість фону (0 = без фону): <b id="v_flBgA"></b></label><input type="range" id="flBgA" min="0" max="100" step="1"></div></div>
-  <p class="ttl" style="margin-top:16px">Талісман (відео по центру)</p>
-  <p style="font-size:11px;opacity:.5;margin:0">Коротке відео без звуку, до 3 МБ, на однотонному фоні (зелений тощо). Більше відео — поклади файл у репозиторій і вкажи шлях нижче. <b id="mvSt"></b></p>
-  <div class="g2" style="margin:6px 0"><button class="small" id="mvUp">🎬 Завантажити відео</button><button class="small" id="mvDel">✕ Видалити</button></div>
-  <input type="file" id="mvFile" hidden accept="video/*">
-  <label>Або шлях/URL відео (наприклад mascot.webm)</label><input id="vUrl" placeholder="mascot.webm">
-  <label>Горизонталь (%): <b id="v_vX"></b></label><input type="range" id="vX" min="0" max="100" step="0.5"><label>Вертикаль (%): <b id="v_vY"></b></label><input type="range" id="vY" min="0" max="100" step="0.5"><label>Розмір (0 = сховати): <b id="v_vScale"></b></label><input type="range" id="vScale" min="0" max="3" step="0.05">
-  <div class="sw"><span>Видаляти фон (chroma key)</span><input type="checkbox" id="vChroma"></div>
-  <div class="sw"><span>Колір фону авто (лівий верхній піксель)</span><input type="checkbox" id="vAuto"></div>
-  <label>Колір фону вручну</label><input id="vKey" type="color">
-  <label>Допуск кольору: <b id="v_vTol"></b></label><input type="range" id="vTol" min="0" max="100" step="1"><label>М’якість краю: <b id="v_vSoft"></b></label><input type="range" id="vSoft" min="0" max="100" step="1">
-  <p class="ttl" style="margin-top:16px">Учасники (номер;імʼя;країна — по рядку)</p>
-  <textarea id="ppl" rows="9" placeholder="25;MYHRE;no&#10;24;KIMELI;be&#10;21;GRESSIER;fr"></textarea>
-  <div class="g2" style="margin-top:8px"><button class="small" id="ap">Застосувати список</button><button class="small" id="csv">Завантажити CSV/TXT</button></div>
-  <input type="file" id="csvf" hidden accept=".csv,.txt">
-  <p class="ttl" style="margin-top:16px">Прапор / логотип команди</p>
-  <p style="font-size:11px;opacity:.5;margin:0">Код країни (ua, no, be, es, ie, fr, se, it, gb) або 🖼 свій логотип. Логотип важливіший за прапор.</p>
-  <div class="sw"><span>Показувати прапори/логотипи</span><input type="checkbox" id="showFlags"></div>
-  <div id="rlogos"></div>
-  <button class="small" id="rst" style="margin-top:14px;background:#7f1d1d">⟲ СКИНУТИ ГОНКУ</button>
-  <p style="font-size:11px;opacity:.5;word-break:break-all">Оверлей: overlay.html?race=<span id="rn"></span></p>
- </div>
+ <div id="set"><details class="sec"><summary>Забіг</summary><div><label>Назва</label><input id="title"><label>Клуб / організація</label><input id="club"><label>Дистанція (м)</label><input id="dist" type="number"><label>Довжина кола (м)</label><input id="lap" type="number"><label>Перший відрізок до першого «Коло» (м, 0 = повне коло)</label><input id="firstSeg" type="number"><div class="g2" style="margin-top:6px"><button class="small" id="fs0">Повне коло</button><button class="small" id="fs200">Старт з пів кола</button></div><label>Логотип у шапці</label><input id="logo" type="file" accept="image/*"><button class="small" id="nologo" style="margin-top:6px">Прибрати логотип шапки</button><div class="sw"><span>Показувати прапори/логотипи біля учасників</span><input type="checkbox" id="showFlags"></div></div></details><details class="sec"><summary>Учасники та клуби</summary><div><p class="hint">Формат рядка: номер;імʼя;країна;клуб</p><textarea id="ppl" rows="9" placeholder="25;MYHRE;no;Sportsklubb&#10;24;KIMELI;be;Brussels AC"></textarea><div class="g2" style="margin-top:8px"><button class="small" id="ap">Застосувати список</button><button class="small" id="csv">Завантажити CSV/TXT</button></div><input type="file" id="csvf" hidden accept=".csv,.txt"><p class="hint" style="margin-top:12px">Прапор (код країни: ua, no, be…), клуб, власний логотип:</p><div id="rlogos"></div></div></details><details class="sec"><summary>Плашки (розмір і положення)</summary><div><div class="sw"><span>Ліва плашка</span><input type="checkbox" id="showL"></div><div class="sw"><span>Права плашка</span><input type="checkbox" id="showR"></div><label>Розмір лівої: <b id="v_scaleL"></b></label><input type="range" id="scaleL" min="0.3" max="3" step="0.05"><label>Розмір правої: <b id="v_scaleR"></b></label><input type="range" id="scaleR" min="0.3" max="3" step="0.05"><label>Ліва: відступ зліва (px): <b id="v_lx"></b></label><input type="range" id="lx" min="0" max="1500" step="5"><label>Ліва: відступ знизу (px): <b id="v_ly"></b></label><input type="range" id="ly" min="0" max="1000" step="5"><label>Права: відступ справа (px): <b id="v_rx"></b></label><input type="range" id="rx" min="0" max="1500" step="5"><label>Права: відступ знизу (px): <b id="v_ry"></b></label><input type="range" id="ry" min="0" max="1000" step="5"><div class="g2"><div><label>Колір фону</label><input id="bg" type="color"></div><div><label>Акцент</label><input id="acc" type="color"></div></div></div></details><details class="sec"><summary>Табло (результати / клуби)</summary><div><label>Горизонталь (%): <b id="v_bX"></b></label><input type="range" id="bX" min="-20" max="120" step="0.5"><label>Вертикаль (%): <b id="v_bY"></b></label><input type="range" id="bY" min="-20" max="120" step="0.5"><label>Розмір (0 = сховати): <b id="v_bScale"></b></label><input type="range" id="bScale" min="0" max="6" step="0.05"><label>Секунд на сторінку клубу: <b id="v_clubSec"></b></label><input type="range" id="clubSec" min="3" max="60" step="1"></div></details><details class="sec"><summary>Рухомий логотип</summary><div><p class="hint">Розмір 0 = приховано. За замовчуванням знизу посередині. <b id="flSt"></b></p><div class="g2" style="margin:6px 0"><button class="small" id="flUp">🖼 Завантажити лого</button><button class="small" id="flDel">✕ Видалити</button></div><input type="file" id="flLogo" hidden accept="image/*"><label>Горизонталь (%): <b id="v_flX"></b></label><input type="range" id="flX" min="-20" max="120" step="0.5"><label>Вертикаль (%): <b id="v_flY"></b></label><input type="range" id="flY" min="-20" max="120" step="0.5"><label>Розмір (0 = сховати): <b id="v_flScale"></b></label><input type="range" id="flScale" min="0" max="6" step="0.05"><div class="g2"><div><label>Колір фону</label><input id="flBg" type="color"></div><div><label>Непрозорість фону (0 = без): <b id="v_flBgA"></b></label><input type="range" id="flBgA" min="0" max="100" step="1"></div></div></div></details><details class="sec"><summary>Талісман (відео)</summary><div><p class="hint">Коротке відео без звуку до 3.5 МБ на однотонному фоні. <b id="mvSt"></b></p><div class="g2" style="margin:6px 0"><button class="small" id="mvUp">🎬 Завантажити відео</button><button class="small" id="mvDel">✕ Видалити</button></div><input type="file" id="mvFile" hidden accept="video/*"><label>Або шлях/URL відео (mascot.webm)</label><input id="vUrl" placeholder="mascot.webm"><label>Горизонталь (%): <b id="v_vX"></b></label><input type="range" id="vX" min="-20" max="120" step="0.5"><label>Вертикаль (%): <b id="v_vY"></b></label><input type="range" id="vY" min="-20" max="120" step="0.5"><label>Розмір (0 = сховати): <b id="v_vScale"></b></label><input type="range" id="vScale" min="0" max="6" step="0.05"><div class="sw"><span>Видаляти фон (chroma key)</span><input type="checkbox" id="vChroma"></div><div class="sw"><span>Колір фону авто (лівий верхній піксель)</span><input type="checkbox" id="vAuto"></div><label>Колір фону вручну</label><input id="vKey" type="color"><label>Допуск кольору: <b id="v_vTol"></b></label><input type="range" id="vTol" min="0" max="100" step="1"><label>М’якість краю: <b id="v_vSoft"></b></label><input type="range" id="vSoft" min="0" max="100" step="1"></div></details><details class="sec"><summary>Дані та скидання</summary><div><button class="small" id="exp2">⬇ Завантажити результати (CSV)</button><button class="small" id="rst" style="margin-top:8px;background:#7f3d1d">⟲ Скинути лише час гонки</button><button class="small" id="wipe" style="margin-top:8px;background:#7f1d1d">🗑 ОБНУЛИТИ ЗАБІГ (все видалити)</button><p class="hint">Обнулення видаляє учасників, час, логотипи, відео й табло. Перед цим запропонує зберегти результати.</p><p class="hint" style="word-break:break-all">Оверлей: overlay.html?race=<span id="rn"></span></p></div></details></div>
 </main>
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
@@ -104,12 +73,14 @@ const TOTAL = 4, $ = q => document.querySelector(q);
 let rid = parseInt(new URLSearchParams(location.search).get('race')) || 1; if (rid < 1 || rid > TOTAL) rid = 1;
 let off = 0; onValue(ref(db, '.info/serverTimeOffset'), s => off = s.val() || 0);
 const sNow = () => Date.now() + off;
-const DEF = {dist:10000,lap:400,scaleL:1,scaleR:1,lx:40,ly:40,rx:40,ry:40,firstSeg:0,showL:true,showR:true,flX:50,flY:92,flScale:1,flBg:'#000000',flBgA:0,vX:50,vY:50,vScale:1,vChroma:true,vAuto:true,vKey:'#00ff00',vTol:40,vSoft:20,vUrl:'',showFlags:true,bg:'#1b2a6b',acc:'#f5a623',title:'10000M FINAL',club:'',logo:''};
-let S = {cfg:{...DEF}, runners:[], laps:[], fin:[], pos:[], startTs:0, stopTs:0}, unsub = null, first = true;
+const DEF = {bX:50,bY:50,bScale:.9,clubSec:10,flX:50,flY:92,flScale:1,flBg:'#000000',flBgA:0,vX:50,vY:50,vScale:1,vChroma:true,vAuto:true,vKey:'#00ff00',vTol:40,vSoft:20,vUrl:'',
+  dist:10000,lap:400,firstSeg:0,scaleL:1,scaleR:1,lx:40,ly:40,rx:40,ry:40,showL:true,showR:true,showFlags:true,bg:'#1b2a6b',acc:'#f5a623',title:'10000M FINAL',club:'',logo:''};
+const blank = () => ({ cfg:{...DEF}, runners:[], laps:[], fin:[], pos:[], board:{mode:'',ts:0}, startTs:0, stopTs:0 });
+let S = blank(), unsub = null, unsubM = null, first = true, gRef, pt = null;
 const fmt = ms => { const t=Math.max(0,ms),m=Math.floor(t/60000),s=Math.floor(t%60000/1000),c=Math.floor(t%1000/10); return m+':'+String(s).padStart(2,'0')+'.'+String(c).padStart(2,'0') };
+const pace = (ms, d) => fmt(ms / (d / 1000)).replace(/\.\d+$/, '');
 const elapsed = () => S.startTs ? (S.stopTs || sNow()) - S.startTs : 0;
 const running = () => S.startTs && !S.stopTs;
-let gRef, unsubM = null; let pt = null;
 function push(){ clearTimeout(pt); pt = setTimeout(() => set(gRef, JSON.parse(JSON.stringify(S))).catch(e => { $('#conn').textContent = 'ПОМИЛКА ЗАПИСУ'; $('#conn').className = 'offl'; alert('Запис не вдався: ' + e.code + '. Перевір Rules для race/'); }), 80); }
 
 function buildBar(){
@@ -120,17 +91,15 @@ function buildBar(){
 }
 onValue(ref(db, '.info/connected'), s => { const e = $('#conn'); e.textContent = s.val() ? 'ОНЛАЙН' : 'ОФЛАЙН'; e.className = s.val() ? 'on' : 'offl'; });
 function connect(){
-  if (unsub) unsub(); first = true; $('#rn').textContent = rid;
+  if (unsub) unsub(); if (unsubM) unsubM(); first = true; $('#rn').textContent = rid;
   gRef = ref(db, 'race/track' + rid);
-  if (unsubM) unsubM();
   unsubM = onValue(ref(db, 'race/media' + rid + '/meta'), s => { const m = s.val() || {};
     $('#flSt').textContent = m.logo ? '✓ лого завантажено' : ''; $('#mvSt').textContent = m.video ? '✓ відео ' + Math.round(m.video / 1024) + ' КБ' : ''; });
   unsub = onValue(gRef, snap => {
     const d = snap.val();
-    S = d ? { cfg:{...DEF, ...(d.cfg||{})}, runners:d.runners||[], laps:d.laps||[], fin:d.fin||[], pos:d.pos||[], startTs:d.startTs||0, stopTs:d.stopTs||0 }
-            : { cfg:{...DEF}, runners:[], laps:[], fin:[], pos:[], startTs:0, stopTs:0 };
+    S = d ? { cfg:{...DEF, ...(d.cfg||{})}, runners:d.runners||[], laps:d.laps||[], fin:d.fin||[], pos:d.pos||[], board:d.board||{mode:'',ts:0}, startTs:d.startTs||0, stopTs:d.stopTs||0 } : blank();
     if (first) { first = false; fillInputs(); }
-    renderList();
+    renderList(); markBoard();
   }, err => { $('#conn').textContent = 'НЕМАЄ ДОСТУПУ'; $('#conn').className = 'offl'; alert('Firebase: ' + err.code + '. Перевір Rules для race/'); });
 }
 function fillInputs(){
@@ -142,44 +111,75 @@ function fillInputs(){
 Object.keys(DEF).forEach(k => { const e = $('#' + k); if (!e || e.type === 'file') return;
   e.oninput = () => { S.cfg[k] = e.type === 'checkbox' ? e.checked : (e.type === 'number' || e.type === 'range') ? +e.value : e.value;
     const vv = $('#v_' + k); if (vv) vv.textContent = e.value; push(); }; });
-$('#logo').onchange = e => { const f = e.target.files[0]; if (!f) return; const img = new Image(), u = URL.createObjectURL(f);
+$('#logo').onchange = e => { const f = e.target.files[0]; if (!f) return; const img = new Image();
   img.onload = () => { const m = 256, r = Math.min(1, m / Math.max(img.width, img.height)), c = document.createElement('canvas');
     c.width = img.width * r; c.height = img.height * r; c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
-    S.cfg.logo = c.toDataURL('image/png'); push(); }; img.src = u; };
+    S.cfg.logo = c.toDataURL('image/png'); push(); }; img.src = URL.createObjectURL(f); };
 $('#nologo').onclick = () => { S.cfg.logo = ''; push(); };
 $('#fs0').onclick = () => { S.cfg.firstSeg = 0; $('#firstSeg').value = 0; push(); renderList(); };
 $('#fs200').onclick = () => { S.cfg.firstSeg = Math.round(S.cfg.lap / 2); $('#firstSeg').value = S.cfg.firstSeg; push(); renderList(); };
-$('#tg').onclick = () => $('#set').classList.toggle('open');
 $('#bs').onclick = () => { if (running()) return; if (S.startTs && !confirm('Перезапустити гонку?')) return; S.startTs = sNow(); S.stopTs = 0; S.laps = []; S.fin = []; push(); renderList(); };
 $('#bx').onclick = () => { if (running()) { S.stopTs = sNow(); push(); } };
 $('#bl').onclick = () => { if (running()) { S.laps.push(elapsed()); push(); renderList(); } };
 $('#bu').onclick = () => { S.fin.pop(); push(); renderList(); };
-$('#rst').onclick = () => { if (confirm('Скинути гонку?')) { S.startTs = S.stopTs = 0; S.laps = []; S.fin = []; push(); renderList(); } };
+$('#rst').onclick = () => { if (confirm('Скинути час гонки?')) { S.startTs = S.stopTs = 0; S.laps = []; S.fin = []; push(); renderList(); } };
+
+/* ---- табло ---- */
+function setBoard(mode){ S.board = { mode, ts: sNow() }; push(); markBoard(); }
+function markBoard(){ const m = (S.board || {}).mode || ''; $('#bdR').classList.toggle('on', m === 'results'); $('#bdC').classList.toggle('on', m === 'clubs'); }
+$('#bdR').onclick = () => setBoard('results'); $('#bdC').onclick = () => setBoard('clubs'); $('#bdX').onclick = () => setBoard('');
+
+/* ---- експорт та обнулення ---- */
+function exportCsv(){
+  const c = S.cfg, rows = [['Місце','Номер','Імʼя','Клуб','Країна','Результат','Різниця (с)','Темп (хв/км)','Швидкість (км/год)','Дистанція (м)']];
+  const fin = S.fin.map(f => ({ r: S.runners.find(r => r.id === f.id), t: f.t })).filter(x => x.r);
+  const rest = liveList().map(id => ({ r: S.runners.find(r => r.id === id), t: null }));
+  fin.concat(rest).forEach((x, i) => { const t = x.t;
+    rows.push([i + 1, x.r.num, x.r.name, x.r.club || '', x.r.flag || '', t != null ? fmt(t) : '', t != null && i > 0 ? ((t - fin[0].t) / 1000).toFixed(2) : '',
+      t != null ? pace(t, c.dist) : '', t != null ? (c.dist / (t / 1000) * 3.6).toFixed(2) : '', c.dist]); });
+  const csv = '\ufeff' + rows.map(r => r.map(v => '"' + String(v).replace(/"/g, '""') + '"').join(';')).join('\r\n');
+  const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
+  a.download = 'results-' + (c.title || 'race').replace(/[^\w\u0400-\u04FF]+/g, '_') + '-' + new Date().toISOString().slice(0, 10) + '.csv';
+  document.body.appendChild(a); a.click(); a.remove();
+}
+$('#exp').onclick = exportCsv; $('#exp2').onclick = exportCsv;
+$('#wipe').onclick = () => {
+  if ((S.fin.length || S.runners.length) && confirm('Спочатку завантажити результати у файл?')) exportCsv();
+  if (!confirm('Обнулити ВСЕ? Буде видалено учасників, час, логотипи, відео та табло.')) return;
+  const keep = { ...S.cfg, logo: '', vUrl: '' };
+  S = blank(); S.cfg = keep;
+  set(ref(db, 'race/media' + rid), null).catch(console.error);
+  $('#ppl').value = ''; push(); renderList(); renderRL(); markBoard();
+};
+
+/* ---- учасники ---- */
+function syncTa(){ $('#ppl').value = S.runners.map(r => [r.num, r.name, r.flag || '', r.club || ''].join(';').replace(/;+$/, '')).join('\n'); }
 $('#ap').onclick = () => {
   S.runners = $('#ppl').value.split('\n').map(l => l.trim()).filter(Boolean).map((l, i) => {
-    const p = l.split(/[;,\t]/), hn = p.length > 1 && /^\d+$/.test(p[0].trim());
-    const nm = (hn ? p[1] : p[0]).trim(), fl = ((hn ? p[2] : p[1]) || '').trim(), old = S.runners.find(x => x.name === nm) || {};
-    return { id: 'r' + i, num: hn ? +p[0] : i + 1, name: nm, flag: fl || old.flag || '', logo: old.logo || '' }; });
+    const p = l.split(/[;\t]/).map(x => x.trim()), hn = p.length > 1 && /^\d+$/.test(p[0]), o = hn ? 1 : 0;
+    const nm = p[o], fl = p[o + 1] || '', cb = p[o + 2] || '', old = S.runners.find(x => x.name === nm) || {};
+    return { id: 'r' + i, num: hn ? +p[0] : i + 1, name: nm, flag: fl || old.flag || '', club: cb || old.club || '', logo: old.logo || '' }; });
   S.pos = S.runners.map(r => r.id); S.fin = []; push(); renderList(); renderRL(); };
 $('#csv').onclick = () => $('#csvf').click();
 $('#csvf').onchange = e => { const f = e.target.files[0]; if (!f) return; const r = new FileReader(); r.onload = () => { $('#ppl').value = r.result; $('#ap').click(); }; r.readAsText(f); };
-function syncTa(){ $('#ppl').value = S.runners.map(r => [r.num, r.name, r.flag || ''].join(';').replace(/;$/, '')).join('\n'); }
 function renderRL(){
   const box = $('#rlogos'); box.innerHTML = '';
   S.runners.forEach(r => {
-    const row = document.createElement('div'); row.style.cssText = 'display:flex;gap:6px;align-items:center;margin:6px 0';
-    const pv = document.createElement('img'); pv.style.cssText = 'width:34px;height:24px;object-fit:contain;background:#0e1016;border-radius:3px';
+    const row = document.createElement('div'); row.style.cssText = 'display:flex;gap:5px;align-items:center;margin:6px 0';
+    const pv = document.createElement('img'); pv.style.cssText = 'width:34px;height:24px;object-fit:contain;background:#0e1016;border-radius:3px;flex-shrink:0';
     const setPv = () => { const s = r.logo || (r.flag ? 'https://flagcdn.com/w40/' + r.flag.toLowerCase() + '.png' : ''); if (s) pv.src = s; else pv.removeAttribute('src'); }; setPv();
-    const nm = document.createElement('span'); nm.style.cssText = 'flex:1;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap'; nm.textContent = '#' + r.num + ' ' + r.name;
-    const fi = document.createElement('input'); fi.style.cssText = 'width:68px'; fi.placeholder = 'ua'; fi.maxLength = 8; fi.value = r.flag || '';
+    const nm = document.createElement('span'); nm.style.cssText = 'flex:1;min-width:0;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap'; nm.textContent = '#' + r.num + ' ' + r.name;
+    const fi = document.createElement('input'); fi.style.cssText = 'width:54px;padding:8px 4px'; fi.placeholder = 'ua'; fi.maxLength = 8; fi.value = r.flag || '';
     fi.onchange = () => { r.flag = fi.value.trim(); push(); setPv(); syncTa(); };
+    const ci = document.createElement('input'); ci.style.cssText = 'width:92px;padding:8px 6px'; ci.placeholder = 'клуб'; ci.value = r.club || '';
+    ci.onchange = () => { r.club = ci.value.trim(); push(); syncTa(); };
     const up = document.createElement('input'); up.type = 'file'; up.accept = 'image/*'; up.hidden = true;
     up.onchange = () => { const f = up.files[0]; if (!f) return; const img = new Image();
       img.onload = () => { const k = Math.min(1, 96 / Math.max(img.width, img.height)), cv = document.createElement('canvas'); cv.width = img.width * k; cv.height = img.height * k;
         cv.getContext('2d').drawImage(img, 0, 0, cv.width, cv.height); r.logo = cv.toDataURL('image/png'); push(); setPv(); }; img.src = URL.createObjectURL(f); };
-    const b1 = document.createElement('button'); b1.className = 'mvb'; b1.style.cssText = 'width:42px;height:38px;font-size:16px'; b1.textContent = '🖼'; b1.onclick = () => up.click();
-    const b2 = document.createElement('button'); b2.className = 'mvb'; b2.style.cssText = 'width:38px;height:38px;font-size:14px'; b2.textContent = '✕'; b2.onclick = () => { r.logo = ''; push(); setPv(); };
-    row.append(pv, nm, fi, b1, b2, up); box.appendChild(row); });
+    const b1 = document.createElement('button'); b1.className = 'mvb'; b1.style.cssText = 'width:40px;height:38px;font-size:15px'; b1.textContent = '🖼'; b1.onclick = () => up.click();
+    const b2 = document.createElement('button'); b2.className = 'mvb'; b2.style.cssText = 'width:34px;height:38px;font-size:13px'; b2.textContent = '✕'; b2.onclick = () => { r.logo = ''; push(); setPv(); };
+    row.append(pv, nm, fi, ci, b1, b2, up); box.appendChild(row); });
 }
 function liveList(){
   const ids = new Set(S.runners.map(r => r.id)); const p = (S.pos || []).filter(id => ids.has(id));
@@ -205,7 +205,8 @@ function renderList(){
   const n = S.laps.length, cov = n ? (S.cfg.firstSeg || S.cfg.lap) + (n - 1) * S.cfg.lap : 0;
   $('#info').textContent = 'Пробігли ' + cov + ' / ' + S.cfg.dist + ' м · Натискань ' + n + ' · Фінішувало ' + S.fin.length + ' / ' + S.runners.length;
 }
-(function tick(){ $('#clock').textContent = fmt(elapsed()); requestAnimationFrame(tick); })();
+
+/* ---- медіа ---- */
 const mp = p => ref(db, 'race/media' + rid + '/' + p);
 $('#flUp').onclick = () => $('#flLogo').click();
 $('#flLogo').onchange = e => { const f = e.target.files[0]; if (!f) return; const img = new Image();
@@ -221,5 +222,6 @@ $('#mvFile').onchange = e => { const f = e.target.files[0]; e.target.value = '';
   r.onload = () => set(mp('video'), r.result).then(() => set(mp('meta/video'), f.size)).catch(er => alert('Не вдалося: ' + er.code));
   r.readAsDataURL(f); };
 $('#mvDel').onclick = () => { set(mp('video'), null); set(mp('meta/video'), null); };
+(function tick(){ $('#clock').textContent = fmt(elapsed()); requestAnimationFrame(tick); })();
 buildBar(); connect();
 </script></body></html>
