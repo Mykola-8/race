@@ -64,6 +64,8 @@ html,body{margin:0;width:1920px;height:1080px;background:transparent;overflow:hi
 .br .bf img{max-width:44px;max-height:28px;border-radius:2px;display:block}
 .r{text-align:right}.br .t{font:900 .85em Inter;font-variant-numeric:tabular-nums}
 .anim .br{animation:sIn .6s both}
+.br.org .rl{font:900 .6em Inter;opacity:.75;text-transform:uppercase;letter-spacing:.5px}
+.br.org .nm{font-weight:700}
 .dots{display:flex;gap:8px;justify-content:center;padding:12px}
 .dots i{width:10px;height:10px;border-radius:5px;background:rgba(255,255,255,.3);transition:.3s}.dots i.on{background:var(--acc);width:28px}
 </style></head><body>
@@ -89,11 +91,11 @@ document.title = 'Race Overlay — ' + rid;
 let off = 0; onValue(ref(db, '.info/serverTimeOffset'), s => off = s.val() || 0);
 const sNow = () => Date.now() + off;
 const $ = q => document.querySelector(q);
-let S = {cfg:{}, board:{}, runners:[], laps:[], fin:[], pos:[], startTs:0, stopTs:0};
+let S = {cfg:{}, orgs:[], board:{}, runners:[], laps:[], fin:[], pos:[], startTs:0, stopTs:0};
 const fmt = ms => { const t=Math.max(0,ms),m=Math.floor(t/60000),s=Math.floor(t%60000/1000),c=Math.floor(t%1000/10); return m+':'+String(s).padStart(2,'0')+'.'+String(c).padStart(2,'0') };
 const gap = ms => ms<60000 ? '+'+(ms/1000).toFixed(1) : '+'+Math.floor(ms/60000)+':'+String(Math.floor(ms%60000/1000)).padStart(2,'0')+'.'+Math.floor(ms%1000/100);
 const elapsed = () => S.startTs ? (S.stopTs || sNow()) - S.startTs : 0;
-const CD = {listOpen:true,pageSize:10,pgFirst:30,pgNext:5,bX:50,bY:50,bScale:.9,clubSec:10,flX:50,flY:92,flScale:1,flBg:'#000000',flBgA:0,vX:50,vY:50,vScale:1,vChroma:true,vAuto:true,vKey:'#00ff00',vTol:40,vSoft:20,vUrl:'',dist:10000,firstSeg:0,lap:400,scaleL:1,scaleR:1,lx:40,ly:40,rx:40,ry:40,showL:true,showR:true,bg:'#1b2a6b',acc:'#f5a623',title:'',club:'',logo:''};
+const CD = {orgTitle:'Організатори забігу',listOpen:true,pageSize:10,pgFirst:30,pgNext:5,bX:50,bY:50,bScale:.9,clubSec:10,flX:50,flY:92,flScale:1,flBg:'#000000',flBgA:0,vX:50,vY:50,vScale:1,vChroma:true,vAuto:true,vKey:'#00ff00',vTol:40,vSoft:20,vUrl:'',dist:10000,firstSeg:0,lap:400,scaleL:1,scaleR:1,lx:40,ly:40,rx:40,ry:40,showL:true,showR:true,bg:'#1b2a6b',acc:'#f5a623',title:'',club:'',logo:''};
 const cfgNow = () => Object.assign({}, CD, S.cfg);
 const covered = (n, c) => n ? (c.firstSeg || c.lap) + (n - 1) * c.lap : 0;
 let loaded = false, popT = null;
@@ -102,7 +104,7 @@ const els = {}; let avgKey = null, prevIdx = {};
 onValue(ref(db, 'race/track' + rid), snap => {
   const d = snap.val() || {};
   const prevN = S.laps.length;
-  S = { cfg: d.cfg || {}, runners: d.runners || [], laps: d.laps || [], fin: d.fin || [], pos: d.pos || [], board: d.board || {}, startTs: d.startTs || 0, stopTs: d.stopTs || 0 };
+  S = { cfg: d.cfg || {}, runners: d.runners || [], laps: d.laps || [], fin: d.fin || [], pos: d.pos || [], board: d.board || {}, orgs: d.orgs || [], startTs: d.startTs || 0, stopTs: d.stopTs || 0 };
   render();
   if (loaded && S.laps.length > prevN) showPop();
   if (!anchor0) anchor0 = sNow();
@@ -184,6 +186,13 @@ function renderBoard(){
       rw.appendChild(mk('span', 'pn', i + 1)); rw.appendChild(flagEl(x.r, c)); rw.appendChild(mk('span', 'nm', x.r.name));
       if (hasClub) rw.appendChild(mk('span', 'cb', x.r.club || ''));
       rw.appendChild(mk('span', 'r t', x.t != null ? fmt(x.t) : '—')); rw.appendChild(mk('span', 'r t', x.t != null ? paceG(x.t, c.dist) : '—')); bi.appendChild(rw); });
+  } else if (b.mode === 'orgs') {
+    const list = (S.orgs || []).filter(x => x && (x.name || x.role)), n = list.length, rh = Math.max(40, Math.min(64, Math.floor(860 / Math.max(1, n))));
+    bi.style.setProperty('--rh', rh + 'px'); bi.style.setProperty('--fs', Math.round(rh * .5) + 'px'); bi.style.setProperty('--cols', '38% 1fr');
+    const hd = mk('div', 'bh'); hd.appendChild(mk('span', '', c.orgTitle || 'Організатори')); hd.appendChild(mk('small', '', c.title || '')); bi.appendChild(hd);
+    if (!n) { bi.appendChild(mk('div', 'bc', 'Додайте організаторів у пульті')); return; }
+    list.forEach((x, i) => { const rw = mk('div', 'br org'); rw.style.animationDelay = i * 90 + 'ms';
+      rw.appendChild(mk('span', 'rl', x.role || '')); rw.appendChild(mk('span', 'nm', x.name || '')); bi.appendChild(rw); });
   } else {
     bi.style.setProperty('--rh', '52px'); bi.style.setProperty('--fs', '28px'); bi.style.setProperty('--cols', '70px 56px 1fr');
     if (!clubs.length) { bi.appendChild(mk('div', 'bh', 'Вкажіть клуби учасників')); return; }
