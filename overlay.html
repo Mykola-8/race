@@ -29,6 +29,10 @@ html,body{margin:0;width:1920px;height:1080px;background:transparent;overflow:hi
 .rp{background:var(--bg);padding:8px 14px 10px}
 .big{font-size:54px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.1}
 .sm{font-size:16px;opacity:.85;display:flex;justify-content:space-between;margin-top:2px}
+.fx{position:absolute;transform-origin:center;display:none}
+#fli{display:block;height:120px}
+#mv{position:absolute;width:2px;height:2px;opacity:0;pointer-events:none}
+#mc{display:block;height:360px;width:auto}
 .pop{position:absolute;left:0;right:0;bottom:calc(100% + 12px);background:var(--bg);border-radius:8px;overflow:hidden;opacity:0;transform:translateY(60px);transition:transform .6s cubic-bezier(.2,.9,.2,1),opacity .4s;pointer-events:none;box-shadow:0 6px 20px rgba(0,0,0,.4)}
 .pop.show{opacity:1;transform:translateY(0)}
 .pop .pr{display:flex;justify-content:space-between;align-items:center;padding:6px 14px;font-size:22px}
@@ -38,6 +42,7 @@ html,body{margin:0;width:1920px;height:1080px;background:transparent;overflow:hi
 .avg{background:var(--acc);color:#111;padding:8px 14px;border-radius:0 0 8px 8px;animation:sIn .6s both}
 .avg .big{font-size:38px}
 </style></head><body>
+<div id="FL" class="fx"><img id="fli"></div><div id="MV" class="fx"><video id="mv" muted loop playsinline autoplay></video><canvas id="mc"></canvas></div>
 <div class="box" id="L"><div class="hd"><img id="lg"><span id="tt"></span><span class="cl" id="cl"></span></div><div class="rows" id="rows"></div></div>
 <div class="box" id="R"><div class="pop" id="pop"><div class="pr"><span>⟲ КОЛО</span><b id="pl"></b></div><div class="pr pm" id="pd"></div><div class="pr last"><span id="pg"></span><b id="pe"></b></div></div><div class="hd"><span>ЧАС</span><span class="cl" id="lapn"></span></div>
  <div class="rp"><div class="big" id="tm">0:00.00</div><div class="sm"><span>Останнє коло</span><b id="ll">—</b></div>
@@ -64,10 +69,11 @@ let S = {cfg:{}, runners:[], laps:[], fin:[], pos:[], startTs:0, stopTs:0};
 const fmt = ms => { const t=Math.max(0,ms),m=Math.floor(t/60000),s=Math.floor(t%60000/1000),c=Math.floor(t%1000/10); return m+':'+String(s).padStart(2,'0')+'.'+String(c).padStart(2,'0') };
 const gap = ms => ms<60000 ? '+'+(ms/1000).toFixed(1) : '+'+Math.floor(ms/60000)+':'+String(Math.floor(ms%60000/1000)).padStart(2,'0')+'.'+Math.floor(ms%1000/100);
 const elapsed = () => S.startTs ? (S.stopTs || sNow()) - S.startTs : 0;
-const CD = {dist:10000,firstSeg:0,lap:400,scaleL:1,scaleR:1,lx:40,ly:40,rx:40,ry:40,showL:true,showR:true,bg:'#1b2a6b',acc:'#f5a623',title:'',club:'',logo:''};
+const CD = {flX:50,flY:92,flScale:1,flBg:'#000000',flBgA:0,vX:50,vY:50,vScale:1,vChroma:true,vAuto:true,vKey:'#00ff00',vTol:40,vSoft:20,vUrl:'',dist:10000,firstSeg:0,lap:400,scaleL:1,scaleR:1,lx:40,ly:40,rx:40,ry:40,showL:true,showR:true,bg:'#1b2a6b',acc:'#f5a623',title:'',club:'',logo:''};
 const cfgNow = () => Object.assign({}, CD, S.cfg);
 const covered = (n, c) => n ? (c.firstSeg || c.lap) + (n - 1) * c.lap : 0;
 let loaded = false, popT = null;
+let M = {}, curVid = '', mvOn = false;
 const els = {}; let avgKey = null, prevIdx = {};
 onValue(ref(db, 'race/track' + rid), snap => {
   const d = snap.val() || {};
@@ -82,6 +88,42 @@ onValue(ref(db, 'race/track' + rid), snap => {
   e.textContent = 'Firebase: ' + err.code + ' — перевір Rules для race/';
   document.body.appendChild(e);
 });
+onValue(ref(db, 'race/media' + rid), s => { M = s.val() || {}; applyFx(cfgNow()); });
+const hexA = (h, a) => { const n = parseInt(String(h).replace('#', ''), 16); return 'rgba(' + (n >> 16 & 255) + ',' + (n >> 8 & 255) + ',' + (n & 255) + ',' + a + ')'; };
+function applyFx(c){
+  const fl = $('#FL'), im = $('#fli'), s = +c.flScale || 0;
+  if (M.logo && s > 0) {
+    if (im.getAttribute('src') !== M.logo) im.src = M.logo;
+    fl.style.display = 'block'; fl.style.left = c.flX * 19.2 + 'px'; fl.style.top = c.flY * 10.8 + 'px';
+    fl.style.transform = 'translate(-50%,-50%) scale(' + s + ')';
+    fl.style.background = hexA(c.flBg, (c.flBgA || 0) / 100); fl.style.padding = c.flBgA > 0 ? '12px 18px' : '0'; fl.style.borderRadius = '14px';
+  } else fl.style.display = 'none';
+  const mv = $('#MV'), v = $('#mv'), vs = +c.vScale || 0, src = c.vUrl || M.video || '';
+  if (src && vs > 0) {
+    if (curVid !== src) { curVid = src; if (src.startsWith('data:')) v.removeAttribute('crossorigin'); else v.crossOrigin = 'anonymous'; v.src = src; }
+    if (v.paused) v.play().catch(() => {});
+    mv.style.display = 'block'; mv.style.left = c.vX * 19.2 + 'px'; mv.style.top = c.vY * 10.8 + 'px';
+    mv.style.transform = 'translate(-50%,-50%) scale(' + vs + ')'; mvOn = true;
+  } else { mv.style.display = 'none'; mvOn = false; if (!v.paused) v.pause(); if (!src && curVid) { curVid = ''; v.removeAttribute('src'); v.load(); } }
+}
+function loopMv(){
+  requestAnimationFrame(loopMv);
+  const v = $('#mv'); if (!mvOn || v.readyState < 2 || !v.videoWidth) return;
+  const c = cfgNow(), cv = $('#mc'), k = Math.min(1, 480 / Math.max(v.videoWidth, v.videoHeight)), w = Math.round(v.videoWidth * k), h = Math.round(v.videoHeight * k);
+  if (cv.width !== w || cv.height !== h) { cv.width = w; cv.height = h; }
+  const x = cv.getContext('2d', { willReadFrequently: true }); x.drawImage(v, 0, 0, w, h);
+  if (c.vChroma === false) return;
+  let img; try { img = x.getImageData(0, 0, w, h); } catch (e) { return; }
+  const d = img.data; let kr, kg, kb;
+  if (c.vAuto !== false) { kr = d[0]; kg = d[1]; kb = d[2]; } else { const n = parseInt(String(c.vKey).replace('#', ''), 16); kr = n >> 16 & 255; kg = n >> 8 & 255; kb = n & 255; }
+  const tol = c.vTol / 100 * 441, soft = Math.max(1, c.vSoft / 100 * 441);
+  for (let i = 0; i < d.length; i += 4) {
+    const dr = d[i] - kr, dg = d[i+1] - kg, db = d[i+2] - kb, dist = Math.sqrt(dr*dr + dg*dg + db*db);
+    if (dist < tol) d[i+3] = 0; else if (dist < tol + soft) d[i+3] = 255 * (dist - tol) / soft;
+  }
+  x.putImageData(img, 0, 0);
+}
+loopMv();
 function showPop(){
   const c = cfgNow(), n = S.laps.length, cov = covered(n, c), p = $('#pop');
   $('#pl').textContent = fmt(S.laps[n - 1] - (S.laps[n - 2] || 0));
@@ -93,6 +135,7 @@ function showPop(){
 }
 function render(){
   const c = cfgNow();
+  applyFx(c);
   const st = document.documentElement.style;
   st.setProperty('--bg', c.bg); st.setProperty('--acc', c.acc);
   ['lx','ly','rx','ry'].forEach(k => st.setProperty('--'+k, c[k]+'px'));
