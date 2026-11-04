@@ -50,7 +50,14 @@ html,body{margin:0;width:1920px;height:1080px;background:transparent;overflow:hi
 .dr.on{max-height:32px;opacity:1}
 .dr .sm{margin:0;padding:3px 0}
 .row.hid{display:none}
+.row .g.lp{color:var(--acc);font-size:15px}
+.row .g.lpa{animation:lpIn .6s both}
+@keyframes lpIn{from{opacity:0;translate:30px 0}to{opacity:1;translate:0 0}}
 .rows.shut{opacity:0}
+#QR{display:block;opacity:0;pointer-events:none;transition:opacity .5s;text-align:center;z-index:4}#QR.on{opacity:1}
+.qi{background:#fff;padding:14px;border-radius:14px;box-shadow:0 8px 30px rgba(0,0,0,.4)}
+.qi img{display:block;width:220px;height:220px;image-rendering:pixelated}
+.qc{margin-top:8px;background:var(--acc);color:#111;font:700 26px Oswald;text-transform:uppercase;padding:6px 14px;border-radius:8px;max-width:260px;display:inline-block}
 #B{z-index:5}
 #bi{width:1100px;background:var(--bg);border-radius:12px;overflow:hidden;box-shadow:0 10px 40px rgba(0,0,0,.5)}
 .bh{display:flex;justify-content:space-between;align-items:center;background:var(--acc);color:#111;padding:0 22px;height:64px;font-size:30px;font-weight:700}
@@ -72,7 +79,9 @@ html,body{margin:0;width:1920px;height:1080px;background:transparent;overflow:hi
 <div id="FL" class="fx"><img id="fli"></div><div id="MV" class="fx"><video id="mv" muted loop playsinline autoplay></video><canvas id="mc"></canvas></div>
 <div class="box" id="L"><div class="rows" id="rows"></div><div class="hd"><img id="lg"><span id="tt"></span><span class="cl" id="cl"></span></div></div>
 <div class="box" id="R"><div class="pop" id="pop"><div class="pr"><span>⟲ КОЛО</span><b id="pl"></b></div><div class="pr pm" id="pd"></div><div class="pr last"><span id="pg"></span><b id="pe"></b></div></div><div id="Rin"><div id="avgw"></div><div id="dt"><div class="dr" id="d1"><div class="sm"><span>Останнє коло</span><b></b></div></div><div class="dr" id="d2"><div class="sm"><span>Серед. швидкість</span><b></b></div></div><div class="dr" id="d3"><div class="sm"><span>Серед. темп</span><b></b></div></div><div class="dr" id="d4"><div class="sm"><span>Темп кола</span><b></b></div></div></div><div class="rp"><div class="big" id="tm">0:00</div></div><div class="hd"><span>ЧАС</span><span class="cl" id="lapn"></span></div></div></div>
+<div id="QR" class="fx"><div class="qi"><img id="qimg"></div><div class="qc" id="qcap"></div></div>
 <div id="B" class="fx"><div id="bi"></div></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
@@ -91,22 +100,24 @@ document.title = 'Race Overlay — ' + rid;
 let off = 0; onValue(ref(db, '.info/serverTimeOffset'), s => off = s.val() || 0);
 const sNow = () => Date.now() + off;
 const $ = q => document.querySelector(q);
-let S = {cfg:{}, orgs:[], board:{}, runners:[], laps:[], fin:[], pos:[], startTs:0, stopTs:0};
+let S = {cfg:{}, clubs:[], orgs:[], board:{}, runners:[], laps:[], fin:[], pos:[], startTs:0, stopTs:0};
 const fmt = ms => { const t=Math.max(0,ms),m=Math.floor(t/60000),s=Math.floor(t%60000/1000),c=Math.floor(t%1000/10); return m+':'+String(s).padStart(2,'0')+'.'+String(c).padStart(2,'0') };
 const gap = ms => ms<60000 ? '+'+(ms/1000).toFixed(1) : '+'+Math.floor(ms/60000)+':'+String(Math.floor(ms%60000/1000)).padStart(2,'0')+'.'+Math.floor(ms%1000/100);
 const elapsed = () => S.startTs ? (S.stopTs || sNow()) - S.startTs : 0;
-const CD = {orgTitle:'Організатори забігу',listOpen:true,pageSize:10,pgFirst:30,pgNext:5,bX:50,bY:50,bScale:.9,clubSec:10,flX:50,flY:92,flScale:1,flBg:'#000000',flBgA:0,vX:50,vY:50,vScale:1,vChroma:true,vAuto:true,vKey:'#00ff00',vTol:40,vSoft:20,vUrl:'',dist:10000,firstSeg:0,lap:400,scaleL:1,scaleR:1,lx:40,ly:40,rx:40,ry:40,showL:true,showR:true,bg:'#1b2a6b',acc:'#f5a623',title:'',club:'',logo:''};
+const CD = {leadPace:true,leadPaceSec:6,qrShow:false,qrText:'',qrCap:'',qrX:88,qrY:50,qrScale:1,orgTitle:'Організатори забігу',listOpen:true,pageSize:10,pgFirst:30,pgNext:5,bX:50,bY:50,bScale:.9,clubSec:10,flX:50,flY:92,flScale:1,flBg:'#000000',flBgA:0,vX:50,vY:50,vScale:1,vChroma:true,vAuto:true,vKey:'#00ff00',vTol:40,vSoft:20,vUrl:'',dist:10000,firstSeg:0,lap:400,scaleL:1,scaleR:1,lx:40,ly:40,rx:40,ry:40,showL:true,showR:true,bg:'#1b2a6b',acc:'#f5a623',title:'',club:'',logo:''};
 const cfgNow = () => Object.assign({}, CD, S.cfg);
 const covered = (n, c) => n ? (c.firstSeg || c.lap) + (n - 1) * c.lap : 0;
 let loaded = false, popT = null;
-let M = {}, curVid = '', mvOn = false, prevShowL, prevOpen, bKey = '', bPage = -1, curLP = 0, anchor0 = 0;
+let M = {}, curVid = '', mvOn = false, prevShowL, prevOpen, bKey = '', bPage = -1, curLP = 0, anchor0 = 0, lpUntil = 0, lpT = null;
 const els = {}; let avgKey = null, prevIdx = {};
 onValue(ref(db, 'race/track' + rid), snap => {
   const d = snap.val() || {};
   const prevN = S.laps.length;
-  S = { cfg: d.cfg || {}, runners: d.runners || [], laps: d.laps || [], fin: d.fin || [], pos: d.pos || [], board: d.board || {}, orgs: d.orgs || [], startTs: d.startTs || 0, stopTs: d.stopTs || 0 };
+  S = { cfg: d.cfg || {}, runners: d.runners || [], laps: d.laps || [], fin: d.fin || [], pos: d.pos || [], board: d.board || {}, orgs: d.orgs || [], clubs: d.clubs || [], startTs: d.startTs || 0, stopTs: d.stopTs || 0 };
+  const lapped = loaded && S.laps.length > prevN;
+  if (lapped) { const cc = cfgNow(), sec = cc.leadPaceSec === undefined ? 6 : +cc.leadPaceSec; lpUntil = Date.now() + sec * 1000; clearTimeout(lpT); if (sec > 0) lpT = setTimeout(render, sec * 1000 + 80); }
   render();
-  if (loaded && S.laps.length > prevN) showPop();
+  if (lapped) showPop();
   if (!anchor0) anchor0 = sNow();
   loaded = true;
 }, err => {
@@ -117,7 +128,21 @@ onValue(ref(db, 'race/track' + rid), snap => {
 });
 onValue(ref(db, 'race/media' + rid), s => { M = s.val() || {}; applyFx(cfgNow()); });
 const hexA = (h, a) => { const n = parseInt(String(h).replace('#', ''), 16); return 'rgba(' + (n >> 16 & 255) + ',' + (n >> 8 & 255) + ',' + (n & 255) + ',' + a + ')'; };
+let qrCur = '', qrLoading = false;
+function qrSrc(t){ if (typeof qrcode === 'undefined') return ''; try { const q = qrcode(0, 'M'); q.addData(t); q.make(); return q.createDataURL(8, 0); } catch (e) { return ''; } }
+function applyQr(c){
+  const q = $('#QR'), s = +c.qrScale || 0, t = String(c.qrText || '').trim();
+  if (!(c.qrShow === true && t && s > 0)) { q.classList.remove('on'); return; }
+  if (t !== qrCur) { const src = qrSrc(t);
+    if (src) { $('#qimg').src = src; qrCur = t; }
+    else if (!qrLoading) { qrLoading = true; const sc = document.createElement('script'); sc.src = 'https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js'; sc.onload = () => { qrCur = ''; applyFx(cfgNow()); }; document.head.appendChild(sc); }
+    if (t !== qrCur) return; }
+  q.style.left = c.qrX * 19.2 + 'px'; q.style.top = c.qrY * 10.8 + 'px'; q.style.transform = 'translate(-50%,-50%) scale(' + s + ')';
+  $('#qcap').style.display = c.qrCap ? 'inline-block' : 'none'; $('#qcap').textContent = c.qrCap || '';
+  q.classList.add('on');
+}
 function applyFx(c){
+  applyQr(c);
   const fl = $('#FL'), im = $('#fli'), s = +c.flScale || 0;
   if (M.logo && s > 0) {
     if (im.getAttribute('src') !== M.logo) im.src = M.logo;
@@ -151,6 +176,7 @@ function loopMv(){
   x.putImageData(img, 0, 0);
 }
 loopMv();
+const logoOf = r => r.logo || ((S.clubs || []).find(x => x.n === String(r.club || '').trim()) || {}).logo || '';
 const paceG = (ms, m) => fmt(ms / (m / 1000)).replace(/\.\d+$/, '') + ' /км';
 function ordered(){
   const ids = new Set(S.runners.map(r => r.id)), fin = S.fin.map(f => ({ r: S.runners.find(r => r.id === f.id), t: f.t })).filter(x => x.r);
@@ -164,7 +190,7 @@ function clubsList(){
 }
 const mk = (t, cl, tx) => { const e = document.createElement(t); if (cl) e.className = cl; if (tx !== undefined) e.textContent = tx; return e; };
 function flagEl(r, c){
-  const w = mk('span', 'bf'), src = r.logo || (r.flag ? 'https://flagcdn.com/w80/' + String(r.flag).toLowerCase().trim() + '.png' : '');
+  const w = mk('span', 'bf'), src = logoOf(r) || (r.flag ? 'https://flagcdn.com/w80/' + String(r.flag).toLowerCase().trim() + '.png' : '');
   if (src && c.showFlags !== false) { const im = document.createElement('img'); im.src = src; w.appendChild(im); } return w;
 }
 function renderBoard(){
@@ -202,6 +228,7 @@ function renderBoard(){
     const dots = mk('div', 'dots'); clubs.forEach((_, i) => dots.appendChild(mk('i', i === page ? 'on' : ''))); bi.appendChild(dots);
   }
 }
+function avgPaceNow(c){ const n = S.laps.length; if (!n) return null; const t = S.laps[n - 1], cov = covered(n, c); return t > 0 && cov > 0 ? paceG(t, cov) : null; }
 function listPage(c){
   const size = Math.max(3, +c.pageSize || 10), pages = Math.ceil(S.runners.length / size); if (pages <= 1) return 0;
   const a = Math.max(2, +c.pgFirst || 30) * 1000, b = Math.max(2, +c.pgNext || 5) * 1000, cyc = a + (pages - 1) * b, t = Math.max(0, sNow() - (S.startTs || anchor0)) % cyc;
@@ -234,6 +261,9 @@ function render(){
   curLP = lp; $('#rows').style.height = (open ? vis * 40 : 0) + 'px'; $('#rows').classList.toggle('shut', !open);
   Object.keys(els).forEach(id => { if (!ids.has(id)) { els[id].remove(); delete els[id]; } });
   const lead = fin[0];
+  const nLaps = S.laps.length, lpSec = c.leadPaceSec === undefined ? 6 : +c.leadPaceSec;
+  const showLP = nLaps > 0 && c.leadPace !== false && (lpSec === 0 || Date.now() < lpUntil);
+  const leadRun = list.find(r => !fin.some(x => x.id === r.id)), lpTxt = showLP && leadRun ? avgPaceNow(c) : null;
   list.forEach((r, i) => {
     let e = els[r.id];
     if (!e) { e = els[r.id] = document.createElement('div'); e.className = 'row in'; e.style.animationDelay = i*60+'ms'; e.style.setProperty('--from', ((list.length - i) * 40 + 20) + 'px');
@@ -248,11 +278,16 @@ function render(){
     if (pv !== undefined && pv !== i && !f) { e._mv = i < pv ? 'up' : 'dn'; clearTimeout(e._t); e._t = setTimeout(() => { e._mv = null; render(); }, 3500); }
     if (f) e._mv = null;
     e.classList.toggle('fin', !!f); e.classList.toggle('up', e._mv === 'up'); e.classList.toggle('dn', e._mv === 'dn');
-    const im = e.children[2].firstChild, src = r.logo || (r.flag ? 'https://flagcdn.com/w80/' + String(r.flag).toLowerCase().trim() + '.png' : '');
+    const im = e.children[2].firstChild, src = logoOf(r) || (r.flag ? 'https://flagcdn.com/w80/' + String(r.flag).toLowerCase().trim() + '.png' : '');
     if (src) { if (im.getAttribute('src') !== src) im.src = src; im.style.display = ''; } else { im.removeAttribute('src'); im.style.display = 'none'; }
     e.children[2].style.display = (c.showFlags === false) ? 'none' : '';
     e.children[0].textContent = i + 1; e.children[1].textContent = r.num; e.children[3].textContent = r.name;
+    const gEl = e.children[4];
     e.children[4].textContent = f ? (f === lead ? fmt(f.t) : gap(f.t - lead.t)) : (e._mv === 'up' ? '▲' : e._mv === 'dn' ? '▼' : '');
+    const isLP = !!lpTxt && leadRun && r.id === leadRun.id && !f;
+    if (isLP) { gEl.textContent = lpTxt; if (e._lpKey !== nLaps) { e._lpKey = nLaps; gEl.classList.remove('lpa'); void gEl.offsetWidth; gEl.classList.add('lpa'); } }
+    else { e._lpKey = -1; gEl.classList.remove('lpa'); }
+    gEl.classList.toggle('lp', isLP);
   });
   prevIdx = {}; list.forEach((r, i) => prevIdx[r.id] = i);
   const aw = $('#avgw');
