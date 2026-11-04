@@ -54,6 +54,8 @@ input[type=color]{height:40px;padding:2px}input[type=range]{padding:0}
   <p class="ttl" style="margin-top:16px">Забіг</p>
   <label>Назва</label><input id="title"><label>Клуб / організація</label><input id="club">
   <label>Дистанція (м)</label><input id="dist" type="number"><label>Довжина кола (м)</label><input id="lap" type="number">
+  <label>Перший відрізок до першого натискання «Коло» (м, 0 = повне коло)</label><input id="firstSeg" type="number">
+  <div class="g2" style="margin-top:6px"><button class="small" id="fs0">Повне коло</button><button class="small" id="fs200">Старт з пів кола (200 м)</button></div>
   <div class="g2"><div><label>Фон</label><input id="bg" type="color"></div><div><label>Акцент</label><input id="acc" type="color"></div></div>
   <label>Логотип</label><input id="logo" type="file" accept="image/*">
   <button class="small" id="nologo" style="margin-top:6px">Прибрати логотип</button>
@@ -86,7 +88,7 @@ const TOTAL = 4, $ = q => document.querySelector(q);
 let rid = parseInt(new URLSearchParams(location.search).get('race')) || 1; if (rid < 1 || rid > TOTAL) rid = 1;
 let off = 0; onValue(ref(db, '.info/serverTimeOffset'), s => off = s.val() || 0);
 const sNow = () => Date.now() + off;
-const DEF = {dist:10000,lap:400,scaleL:1,scaleR:1,lx:40,ly:40,rx:40,ry:40,showL:true,showR:true,showFlags:true,bg:'#1b2a6b',acc:'#f5a623',title:'10000M FINAL',club:'',logo:''};
+const DEF = {dist:10000,lap:400,scaleL:1,scaleR:1,lx:40,ly:40,rx:40,ry:40,firstSeg:0,showL:true,showR:true,showFlags:true,bg:'#1b2a6b',acc:'#f5a623',title:'10000M FINAL',club:'',logo:''};
 let S = {cfg:{...DEF}, runners:[], laps:[], fin:[], pos:[], startTs:0, stopTs:0}, unsub = null, first = true;
 const fmt = ms => { const t=Math.max(0,ms),m=Math.floor(t/60000),s=Math.floor(t%60000/1000),c=Math.floor(t%1000/10); return m+':'+String(s).padStart(2,'0')+'.'+String(c).padStart(2,'0') };
 const elapsed = () => S.startTs ? (S.stopTs || sNow()) - S.startTs : 0;
@@ -126,6 +128,8 @@ $('#logo').onchange = e => { const f = e.target.files[0]; if (!f) return; const 
     c.width = img.width * r; c.height = img.height * r; c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
     S.cfg.logo = c.toDataURL('image/png'); push(); }; img.src = u; };
 $('#nologo').onclick = () => { S.cfg.logo = ''; push(); };
+$('#fs0').onclick = () => { S.cfg.firstSeg = 0; $('#firstSeg').value = 0; push(); renderList(); };
+$('#fs200').onclick = () => { S.cfg.firstSeg = Math.round(S.cfg.lap / 2); $('#firstSeg').value = S.cfg.firstSeg; push(); renderList(); };
 $('#tg').onclick = () => $('#set').classList.toggle('open');
 $('#bs').onclick = () => { if (running()) return; if (S.startTs && !confirm('Перезапустити гонку?')) return; S.startTs = sNow(); S.stopTs = 0; S.laps = []; S.fin = []; push(); renderList(); };
 $('#bx').onclick = () => { if (running()) { S.stopTs = sNow(); push(); } };
@@ -179,8 +183,8 @@ function renderList(){
       [['▲', () => mv(r.id, j - 1)], ['▼', () => mv(r.id, j + 1)], ['⇅', () => { const n = parseInt(prompt('Нова позиція серед тих, хто біжить (1–' + live.length + '):', j + 1)); if (n) mv(r.id, n - 1); }]]
         .forEach(([t, fn]) => { const m = document.createElement('button'); m.className = 'mvb'; m.textContent = t; m.onclick = fn; w.appendChild(m); }); }
     rl.appendChild(w); });
-  const tot = Math.round(S.cfg.dist / S.cfg.lap);
-  $('#info').textContent = 'Коло ' + S.laps.length + ' / ' + tot + ' · Фінішувало ' + S.fin.length + ' / ' + S.runners.length;
+  const n = S.laps.length, cov = n ? (S.cfg.firstSeg || S.cfg.lap) + (n - 1) * S.cfg.lap : 0;
+  $('#info').textContent = 'Пробігли ' + cov + ' / ' + S.cfg.dist + ' м · Натискань ' + n + ' · Фінішувало ' + S.fin.length + ' / ' + S.runners.length;
 }
 (function tick(){ $('#clock').textContent = fmt(elapsed()); requestAnimationFrame(tick); })();
 buildBar(); connect();
