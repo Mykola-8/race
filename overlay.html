@@ -39,14 +39,13 @@ html,body{margin:0;width:1920px;height:1080px;background:transparent;overflow:hi
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 const firebaseConfig = {
-        apiKey: "AIzaSyDf6PYBjF096FRE-fUUo5boS8jsieVS9xA",
-        authDomain: "padel3-overley.firebaseapp.com",
-        databaseURL: "https://padel3-overley-default-rtdb.europe-west1.firebasedatabase.app",
-        projectId: "padel3-overley",
-        storageBucket: "padel3-overley.firebasestorage.app",
-        messagingSenderId: "1003185317510",
-        appId: "1:1003185317510:web:07be70f0d0354a1f0bd307",
-        measurementId: "G-HFRXC32BE1"
+        apiKey: "AIzaSyC8OE5_mqGlQcLCQXkUftDqt-J6uv2fBNs",
+        authDomain: "race-overlay.firebaseapp.com",
+        databaseURL: "https://race-overlay-default-rtdb.europe-west1.firebasedatabase.app",
+        projectId: "race-overlay",
+        storageBucket: "race-overlay.firebasestorage.app",
+        messagingSenderId: "536216488061",
+        appId: "1:536216488061:web:f18abc0a350ec59e2a8914"
     };
 const db = getDatabase(initializeApp(firebaseConfig));
 const rid = new URLSearchParams(location.search).get('race') || '1';
