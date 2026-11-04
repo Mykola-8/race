@@ -98,7 +98,7 @@ function connect(){
     $('#flSt').textContent = m.logo ? '✓ лого завантажено' : ''; $('#mvSt').textContent = m.video ? '✓ відео ' + Math.round(m.video / 1024) + ' КБ' : ''; });
   unsub = onValue(gRef, snap => {
     const d = snap.val();
-    S = d ? { cfg:{...DEF, ...(d.cfg||{})}, orgs:d.orgs||[], clubs:d.clubs||[], runners:d.runners||[], laps:d.laps||[], fin:d.fin||[], pos:d.pos||[], board:d.board||{mode:'',ts:0}, startTs:d.startTs||0, stopTs:d.stopTs||0 } : blank();
+    S = d ? { cfg:{...DEF, ...(d.cfg||{})}, orgs:d.orgs||[], clubs:d.clubs||[], runners:d.runners||[], laps:d.laps||[], fin:d.fin||[], pos:d.pos||[], board:d.board||{mode:'',ts:0}, startTs:d.startTs||0, stopTs:d.stopTs||0, autoStop:!!d.autoStop } : blank();
     if (first) { first = false; fillInputs(); }
     renderList(); markBoard();
   }, err => { $('#conn').textContent = 'НЕМАЄ ДОСТУПУ'; $('#conn').className = 'offl'; alert('Firebase: ' + err.code + '. Перевір Rules для race/'); });
@@ -119,11 +119,11 @@ $('#logo').onchange = e => { const f = e.target.files[0]; if (!f) return; const 
 $('#nologo').onclick = () => { S.cfg.logo = ''; push(); };
 $('#fs0').onclick = () => { S.cfg.firstSeg = 0; $('#firstSeg').value = 0; push(); renderList(); };
 $('#fs200').onclick = () => { S.cfg.firstSeg = Math.round(S.cfg.lap / 2); $('#firstSeg').value = S.cfg.firstSeg; push(); renderList(); };
-$('#bs').onclick = () => { if (running()) return; if (S.startTs && !confirm('Перезапустити гонку?')) return; S.startTs = sNow(); S.stopTs = 0; S.laps = []; S.fin = []; push(); renderList(); };
+$('#bs').onclick = () => { if (running()) return; if (S.startTs && !confirm('Перезапустити гонку?')) return; S.startTs = sNow(); S.stopTs = 0; S.autoStop = false; S.laps = []; S.fin = []; push(); renderList(); };
 $('#bx').onclick = () => { if (running()) { S.stopTs = sNow(); push(); } };
 $('#bl').onclick = () => { if (running()) { S.laps.push(elapsed()); push(); renderList(); } };
-$('#bu').onclick = () => { S.fin.pop(); push(); renderList(); };
-$('#rst').onclick = () => { if (confirm('Скинути час гонки?')) { S.startTs = S.stopTs = 0; S.laps = []; S.fin = []; push(); renderList(); } };
+$('#bu').onclick = () => { S.fin.pop(); if (S.autoStop && S.stopTs) { S.stopTs = 0; S.autoStop = false; } push(); renderList(); };
+$('#rst').onclick = () => { if (confirm('Скинути час гонки?')) { S.startTs = S.stopTs = 0; S.autoStop = false; S.laps = []; S.fin = []; push(); renderList(); } };
 
 /* ---- табло ---- */
 function setBoard(mode){ S.board = { mode, ts: sNow() }; push(); markBoard(); }
@@ -221,7 +221,9 @@ function renderList(){
     const lg = logoOfC(r); if (lg) { const im = document.createElement('img'); im.src = lg; im.style.cssText = 'width:28px;height:20px;object-fit:contain;flex-shrink:0'; b.appendChild(im); }
     const a = document.createElement('span'); a.textContent = (k + 1) + '. #' + r.num + ' ' + r.name; b.appendChild(a);
     if (i > -1) { const t = document.createElement('span'); t.className = 't'; t.textContent = fmt(S.fin[i].t); b.appendChild(t); }
-    b.onclick = () => { if (i > -1 || !running()) return; S.fin.push({ id: r.id, t: elapsed() }); push(); renderList(); };
+    b.onclick = () => { if (i > -1 || !running()) return; S.fin.push({ id: r.id, t: elapsed() });
+      if (S.runners.length && S.fin.length >= S.runners.length) { S.stopTs = S.startTs + S.fin[S.fin.length - 1].t; S.autoStop = true; }
+      push(); renderList(); };
     w.appendChild(b);
     if (i < 0) { const j = live.indexOf(r.id);
       [['▲', () => mv(r.id, j - 1)], ['▼', () => mv(r.id, j + 1)], ['⇅', () => { const n = parseInt(prompt('Нова позиція серед тих, хто біжить (1–' + live.length + '):', j + 1)); if (n) mv(r.id, n - 1); }]]
