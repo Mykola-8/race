@@ -29,12 +29,19 @@ html,body{margin:0;width:1920px;height:1080px;background:transparent;overflow:hi
 .rp{background:var(--bg);padding:8px 14px 10px}
 .big{font-size:54px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.1}
 .sm{font-size:16px;opacity:.85;display:flex;justify-content:space-between;margin-top:2px}
+.pop{position:absolute;left:0;right:0;bottom:calc(100% + 12px);background:var(--bg);border-radius:8px;overflow:hidden;opacity:0;transform:translateY(60px);transition:transform .6s cubic-bezier(.2,.9,.2,1),opacity .4s;pointer-events:none;box-shadow:0 6px 20px rgba(0,0,0,.4)}
+.pop.show{opacity:1;transform:translateY(0)}
+.pop .pr{display:flex;justify-content:space-between;align-items:center;padding:6px 14px;font-size:22px}
+.pop .pr b{font:900 24px Inter;font-variant-numeric:tabular-nums}
+.pop .pm{font:700 44px Oswald;justify-content:flex-end;padding-top:0;padding-bottom:0}
+.pop .last{background:var(--acc);color:#111;font-size:20px;padding:6px 14px}
 .avg{background:var(--acc);color:#111;padding:8px 14px;border-radius:0 0 8px 8px;animation:sIn .6s both}
 .avg .big{font-size:38px}
 </style></head><body>
 <div class="box" id="L"><div class="hd"><img id="lg"><span id="tt"></span><span class="cl" id="cl"></span></div><div class="rows" id="rows"></div></div>
-<div class="box" id="R"><div class="hd"><span>ЧАС</span><span class="cl" id="lapn"></span></div>
- <div class="rp"><div class="big" id="tm">0:00.00</div><div class="sm"><span>Останнє коло</span><b id="ll">—</b></div></div><div id="avgw"></div></div>
+<div class="box" id="R"><div class="pop" id="pop"><div class="pr"><span>⟲ КОЛО</span><b id="pl"></b></div><div class="pr pm" id="pd"></div><div class="pr last"><span id="pg"></span><b id="pe"></b></div></div><div class="hd"><span>ЧАС</span><span class="cl" id="lapn"></span></div>
+ <div class="rp"><div class="big" id="tm">0:00.00</div><div class="sm"><span>Останнє коло</span><b id="ll">—</b></div>
+ <div class="sm"><span>Серед. швидкість</span><b id="sp">—</b></div><div class="sm"><span>Серед. темп</span><b id="pc">—</b></div><div class="sm"><span>Темп кола</span><b id="lpc">—</b></div></div><div id="avgw"></div></div>
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
@@ -57,19 +64,35 @@ let S = {cfg:{}, runners:[], laps:[], fin:[], pos:[], startTs:0, stopTs:0};
 const fmt = ms => { const t=Math.max(0,ms),m=Math.floor(t/60000),s=Math.floor(t%60000/1000),c=Math.floor(t%1000/10); return m+':'+String(s).padStart(2,'0')+'.'+String(c).padStart(2,'0') };
 const gap = ms => ms<60000 ? '+'+(ms/1000).toFixed(1) : '+'+Math.floor(ms/60000)+':'+String(Math.floor(ms%60000/1000)).padStart(2,'0')+'.'+Math.floor(ms%1000/100);
 const elapsed = () => S.startTs ? (S.stopTs || sNow()) - S.startTs : 0;
+const CD = {dist:10000,firstSeg:0,lap:400,scaleL:1,scaleR:1,lx:40,ly:40,rx:40,ry:40,showL:true,showR:true,bg:'#1b2a6b',acc:'#f5a623',title:'',club:'',logo:''};
+const cfgNow = () => Object.assign({}, CD, S.cfg);
+const covered = (n, c) => n ? (c.firstSeg || c.lap) + (n - 1) * c.lap : 0;
+let loaded = false, popT = null;
 const els = {}; let avgKey = null, prevIdx = {};
 onValue(ref(db, 'race/track' + rid), snap => {
   const d = snap.val() || {};
+  const prevN = S.laps.length;
   S = { cfg: d.cfg || {}, runners: d.runners || [], laps: d.laps || [], fin: d.fin || [], pos: d.pos || [], startTs: d.startTs || 0, stopTs: d.stopTs || 0 };
   render();
+  if (loaded && S.laps.length > prevN) showPop();
+  loaded = true;
 }, err => {
   const e = document.createElement('div');
   e.style.cssText = 'position:absolute;top:20px;left:20px;background:#c0392b;color:#fff;padding:10px 16px;font:700 22px Inter,sans-serif;border-radius:8px';
   e.textContent = 'Firebase: ' + err.code + ' — перевір Rules для race/';
   document.body.appendChild(e);
 });
+function showPop(){
+  const c = cfgNow(), n = S.laps.length, cov = covered(n, c), p = $('#pop');
+  $('#pl').textContent = fmt(S.laps[n - 1] - (S.laps[n - 2] || 0));
+  $('#pd').textContent = cov + ' м';
+  $('#pg').textContent = Math.max(0, Math.ceil((c.dist - cov) / c.lap)) + ' КІЛ ДО КІНЦЯ';
+  $('#pe').textContent = fmt(S.laps[n - 1]);
+  p.classList.remove('show'); void p.offsetWidth; p.classList.add('show');
+  clearTimeout(popT); popT = setTimeout(() => p.classList.remove('show'), 6000);
+}
 function render(){
-  const c = Object.assign({dist:10000,lap:400,scaleL:1,scaleR:1,lx:40,ly:40,rx:40,ry:40,showL:true,showR:true,bg:'#1b2a6b',acc:'#f5a623',title:'',club:'',logo:''}, S.cfg);
+  const c = cfgNow();
   const st = document.documentElement.style;
   st.setProperty('--bg', c.bg); st.setProperty('--acc', c.acc);
   ['lx','ly','rx','ry'].forEach(k => st.setProperty('--'+k, c[k]+'px'));
@@ -109,8 +132,13 @@ function render(){
         ' км/год</div><div class="sm"><span>Темп</span><b>' + fmt(pace).replace(/\.\d+$/, '') + ' /км</b></div></div>';
       aw.querySelector('.nm').textContent = nm; }
   } else { aw.innerHTML = ''; avgKey = null; }
-  const tot = Math.round(c.dist / c.lap), n = S.laps.length;
-  $('#lapn').textContent = n + '/' + tot;
+  const n = S.laps.length;
+  $('#lapn').textContent = covered(n, c) + ' / ' + c.dist + ' м';
+  const pace = (ms, m) => fmt(ms / (m / 1000)).replace(/\.\d+$/, '') + ' /км';
+  if (n) { const t = S.laps[n - 1], lt = t - (S.laps[n - 2] || 0), ld = n === 1 ? covered(1, c) : c.lap;
+    $('#sp').textContent = (covered(n, c) / (t / 1000) * 3.6).toFixed(1) + ' км/год';
+    $('#pc').textContent = pace(t, covered(n, c)); $('#lpc').textContent = pace(lt, ld); }
+  else { $('#sp').textContent = $('#pc').textContent = $('#lpc').textContent = '—'; }
   $('#ll').textContent = n ? fmt(S.laps[n-1] - (S.laps[n-2] || 0)) : '—';
 }
 (function tick(){ $('#tm').textContent = fmt(elapsed()); requestAnimationFrame(tick); })();
