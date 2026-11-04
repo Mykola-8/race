@@ -25,6 +25,8 @@ button.b:active{transform:scale(.95)}
 .rn{width:100%;display:flex;gap:10px;align-items:center;text-align:left;background:rgba(255,255,255,.06);border:0;border-radius:12px;color:#fff;font:700 18px Oswald;padding:14px;margin-bottom:6px;cursor:pointer}
 .rn.done{background:#15803d}.rn .t{margin-left:auto;font-family:Inter;font-size:14px}
 .rn:active{transform:scale(.97)}
+.rw{display:flex;gap:6px;margin-bottom:6px}.rw .rn{margin:0;flex:1}
+.mvb{width:52px;border:0;border-radius:12px;background:#2b3350;color:#fff;font:900 20px Inter;cursor:pointer}.mvb:active{background:#0055ff}
 label{display:block;font-size:11px;opacity:.6;margin:10px 0 4px}
 input,textarea{width:100%;background:#0e1016;color:#fff;border:1px solid #333;border-radius:8px;padding:10px;font:600 14px Inter}
 input[type=color]{height:40px;padding:2px}input[type=range]{padding:0}
@@ -37,7 +39,7 @@ input[type=color]{height:40px;padding:2px}input[type=range]{padding:0}
  <div class="card"><div id="clock">0:00.00</div><div id="info"></div>
   <div class="g2"><button class="b go" id="bs">▶ Старт</button><button class="b stp" id="bx">■ Стоп</button>
   <button class="b lp" id="bl">⏱ Коло</button><button class="b gr" id="bu">↩ Відмінити</button></div></div>
- <div class="card"><p class="ttl">Фініш — тисни по порядку</p><div id="rl"></div></div>
+ <div class="card"><p class="ttl">Позиції: ▲ перегнав · ▼ програв · ⇅ вказати місце. Фініш — тисни імʼя</p><div id="rl"></div></div>
  <button class="small" id="tg">⚙ НАЛАШТУВАННЯ</button>
  <div id="set" class="card">
   <p class="ttl">Плашки</p>
@@ -55,10 +57,14 @@ input[type=color]{height:40px;padding:2px}input[type=range]{padding:0}
   <div class="g2"><div><label>Фон</label><input id="bg" type="color"></div><div><label>Акцент</label><input id="acc" type="color"></div></div>
   <label>Логотип</label><input id="logo" type="file" accept="image/*">
   <button class="small" id="nologo" style="margin-top:6px">Прибрати логотип</button>
-  <p class="ttl" style="margin-top:16px">Учасники (номер;імʼя — по рядку)</p>
-  <textarea id="ppl" rows="9" placeholder="25;MYHRE&#10;24;KIMELI&#10;21;GRESSIER"></textarea>
+  <p class="ttl" style="margin-top:16px">Учасники (номер;імʼя;країна — по рядку)</p>
+  <textarea id="ppl" rows="9" placeholder="25;MYHRE;no&#10;24;KIMELI;be&#10;21;GRESSIER;fr"></textarea>
   <div class="g2" style="margin-top:8px"><button class="small" id="ap">Застосувати список</button><button class="small" id="csv">Завантажити CSV/TXT</button></div>
   <input type="file" id="csvf" hidden accept=".csv,.txt">
+  <p class="ttl" style="margin-top:16px">Прапор / логотип команди</p>
+  <p style="font-size:11px;opacity:.5;margin:0">Код країни (ua, no, be, es, ie, fr, se, it, gb) або 🖼 свій логотип. Логотип важливіший за прапор.</p>
+  <div class="sw"><span>Показувати прапори/логотипи</span><input type="checkbox" id="showFlags"></div>
+  <div id="rlogos"></div>
   <button class="small" id="rst" style="margin-top:14px;background:#7f1d1d">⟲ СКИНУТИ ГОНКУ</button>
   <p style="font-size:11px;opacity:.5;word-break:break-all">Оверлей: overlay.html?race=<span id="rn"></span></p>
  </div>
@@ -81,8 +87,8 @@ const TOTAL = 4, $ = q => document.querySelector(q);
 let rid = parseInt(new URLSearchParams(location.search).get('race')) || 1; if (rid < 1 || rid > TOTAL) rid = 1;
 let off = 0; onValue(ref(db, '.info/serverTimeOffset'), s => off = s.val() || 0);
 const sNow = () => Date.now() + off;
-const DEF = {dist:10000,lap:400,scaleL:1,scaleR:1,lx:40,ly:40,rx:40,ry:40,showL:true,showR:true,bg:'#1b2a6b',acc:'#f5a623',title:'10000M FINAL',club:'',logo:''};
-let S = {cfg:{...DEF}, runners:[], laps:[], fin:[], startTs:0, stopTs:0}, unsub = null, first = true;
+const DEF = {dist:10000,lap:400,scaleL:1,scaleR:1,lx:40,ly:40,rx:40,ry:40,showL:true,showR:true,showFlags:true,bg:'#1b2a6b',acc:'#f5a623',title:'10000M FINAL',club:'',logo:''};
+let S = {cfg:{...DEF}, runners:[], laps:[], fin:[], pos:[], startTs:0, stopTs:0}, unsub = null, first = true;
 const fmt = ms => { const t=Math.max(0,ms),m=Math.floor(t/60000),s=Math.floor(t%60000/1000),c=Math.floor(t%1000/10); return m+':'+String(s).padStart(2,'0')+'.'+String(c).padStart(2,'0') };
 const elapsed = () => S.startTs ? (S.stopTs || sNow()) - S.startTs : 0;
 const running = () => S.startTs && !S.stopTs;
@@ -101,8 +107,8 @@ function connect(){
   gRef = ref(db, 'race/track' + rid);
   unsub = onValue(gRef, snap => {
     const d = snap.val();
-    S = d ? { cfg:{...DEF, ...(d.cfg||{})}, runners:d.runners||[], laps:d.laps||[], fin:d.fin||[], startTs:d.startTs||0, stopTs:d.stopTs||0 }
-          : { cfg:{...DEF}, runners:[], laps:[], fin:[], startTs:0, stopTs:0 };
+    S = d ? { cfg:{...DEF, ...(d.cfg||{})}, runners:d.runners||[], laps:d.laps||[], fin:d.fin||[], pos:d.pos||[], startTs:d.startTs||0, stopTs:d.stopTs||0 }
+            : { cfg:{...DEF}, runners:[], laps:[], fin:[], pos:[], startTs:0, stopTs:0 };
     if (first) { first = false; fillInputs(); }
     renderList();
   }, err => { $('#conn').textContent = 'НЕМАЄ ДОСТУПУ'; $('#conn').className = 'offl'; alert('Firebase: ' + err.code + '. Перевір Rules для race/'); });
@@ -111,7 +117,7 @@ function fillInputs(){
   Object.keys(DEF).forEach(k => { const e = $('#' + k); if (!e || e.type === 'file') return;
     if (e.type === 'checkbox') e.checked = !!S.cfg[k]; else e.value = S.cfg[k]; });
   $('#v_scaleL').textContent = S.cfg.scaleL; $('#v_scaleR').textContent = S.cfg.scaleR;
-  $('#ppl').value = S.runners.map(r => r.num + ';' + r.name).join('\n');
+  syncTa(); renderRL();
 }
 Object.keys(DEF).forEach(k => { const e = $('#' + k); if (!e || e.type === 'file') return;
   e.oninput = () => { S.cfg[k] = e.type === 'checkbox' ? e.checked : (e.type === 'number' || e.type === 'range') ? +e.value : e.value;
@@ -130,19 +136,50 @@ $('#rst').onclick = () => { if (confirm('Скинути гонку?')) { S.start
 $('#ap').onclick = () => {
   S.runners = $('#ppl').value.split('\n').map(l => l.trim()).filter(Boolean).map((l, i) => {
     const p = l.split(/[;,\t]/), hn = p.length > 1 && /^\d+$/.test(p[0].trim());
-    return { id: 'r' + i, num: hn ? +p[0] : i + 1, name: (hn ? p.slice(1).join(' ') : l).trim() }; });
-  S.fin = []; push(); renderList(); };
+    const nm = (hn ? p[1] : p[0]).trim(), fl = ((hn ? p[2] : p[1]) || '').trim(), old = S.runners.find(x => x.name === nm) || {};
+    return { id: 'r' + i, num: hn ? +p[0] : i + 1, name: nm, flag: fl || old.flag || '', logo: old.logo || '' }; });
+  S.pos = S.runners.map(r => r.id); S.fin = []; push(); renderList(); renderRL(); };
 $('#csv').onclick = () => $('#csvf').click();
 $('#csvf').onchange = e => { const f = e.target.files[0]; if (!f) return; const r = new FileReader(); r.onload = () => { $('#ppl').value = r.result; $('#ap').click(); }; r.readAsText(f); };
+function syncTa(){ $('#ppl').value = S.runners.map(r => [r.num, r.name, r.flag || ''].join(';').replace(/;$/, '')).join('\n'); }
+function renderRL(){
+  const box = $('#rlogos'); box.innerHTML = '';
+  S.runners.forEach(r => {
+    const row = document.createElement('div'); row.style.cssText = 'display:flex;gap:6px;align-items:center;margin:6px 0';
+    const pv = document.createElement('img'); pv.style.cssText = 'width:34px;height:24px;object-fit:contain;background:#0e1016;border-radius:3px';
+    const setPv = () => { const s = r.logo || (r.flag ? 'https://flagcdn.com/w40/' + r.flag.toLowerCase() + '.png' : ''); if (s) pv.src = s; else pv.removeAttribute('src'); }; setPv();
+    const nm = document.createElement('span'); nm.style.cssText = 'flex:1;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap'; nm.textContent = '#' + r.num + ' ' + r.name;
+    const fi = document.createElement('input'); fi.style.cssText = 'width:68px'; fi.placeholder = 'ua'; fi.maxLength = 8; fi.value = r.flag || '';
+    fi.onchange = () => { r.flag = fi.value.trim(); push(); setPv(); syncTa(); };
+    const up = document.createElement('input'); up.type = 'file'; up.accept = 'image/*'; up.hidden = true;
+    up.onchange = () => { const f = up.files[0]; if (!f) return; const img = new Image();
+      img.onload = () => { const k = Math.min(1, 96 / Math.max(img.width, img.height)), cv = document.createElement('canvas'); cv.width = img.width * k; cv.height = img.height * k;
+        cv.getContext('2d').drawImage(img, 0, 0, cv.width, cv.height); r.logo = cv.toDataURL('image/png'); push(); setPv(); }; img.src = URL.createObjectURL(f); };
+    const b1 = document.createElement('button'); b1.className = 'mvb'; b1.style.cssText = 'width:42px;height:38px;font-size:16px'; b1.textContent = '🖼'; b1.onclick = () => up.click();
+    const b2 = document.createElement('button'); b2.className = 'mvb'; b2.style.cssText = 'width:38px;height:38px;font-size:14px'; b2.textContent = '✕'; b2.onclick = () => { r.logo = ''; push(); setPv(); };
+    row.append(pv, nm, fi, b1, b2, up); box.appendChild(row); });
+}
+function liveList(){
+  const ids = new Set(S.runners.map(r => r.id)); const p = (S.pos || []).filter(id => ids.has(id));
+  S.runners.forEach(r => { if (!p.includes(r.id)) p.push(r.id); });
+  return p.filter(id => !S.fin.some(f => f.id === id));
+}
+function mv(id, to){ const p = liveList(), i = p.indexOf(id); to = Math.max(0, Math.min(p.length - 1, to)); if (i < 0 || i === to) return;
+  p.splice(i, 1); p.splice(to, 0, id); S.pos = p; push(); renderList(); }
 function renderList(){
   const rl = $('#rl'); rl.innerHTML = '';
-  const list = S.fin.map(f => S.runners.find(r => r.id === f.id)).filter(Boolean).concat(S.runners.filter(r => !S.fin.some(f => f.id === r.id)));
-  list.forEach(r => {
-    const i = S.fin.findIndex(f => f.id === r.id), b = document.createElement('button'); b.className = 'rn' + (i > -1 ? ' done' : '');
-    const a = document.createElement('span'); a.textContent = (i > -1 ? (i + 1) + '. ' : '') + '#' + r.num + ' ' + r.name; b.appendChild(a);
+  const live = liveList(), list = S.fin.map(f => S.runners.find(r => r.id === f.id)).filter(Boolean).concat(live.map(id => S.runners.find(r => r.id === id)));
+  list.forEach((r, k) => {
+    const i = S.fin.findIndex(f => f.id === r.id), w = document.createElement('div'); w.className = 'rw'; const b = document.createElement('button');
+    b.className = 'rn' + (i > -1 ? ' done' : '');
+    const a = document.createElement('span'); a.textContent = (k + 1) + '. #' + r.num + ' ' + r.name; b.appendChild(a);
     if (i > -1) { const t = document.createElement('span'); t.className = 't'; t.textContent = fmt(S.fin[i].t); b.appendChild(t); }
     b.onclick = () => { if (i > -1 || !running()) return; S.fin.push({ id: r.id, t: elapsed() }); push(); renderList(); };
-    rl.appendChild(b); });
+    w.appendChild(b);
+    if (i < 0) { const j = live.indexOf(r.id);
+      [['▲', () => mv(r.id, j - 1)], ['▼', () => mv(r.id, j + 1)], ['⇅', () => { const n = parseInt(prompt('Нова позиція серед тих, хто біжить (1–' + live.length + '):', j + 1)); if (n) mv(r.id, n - 1); }]]
+        .forEach(([t, fn]) => { const m = document.createElement('button'); m.className = 'mvb'; m.textContent = t; m.onclick = fn; w.appendChild(m); }); }
+    rl.appendChild(w); });
   const tot = Math.round(S.cfg.dist / S.cfg.lap);
   $('#info').textContent = 'Коло ' + S.laps.length + ' / ' + tot + ' · Фінішувало ' + S.fin.length + ' / ' + S.runners.length;
 }
