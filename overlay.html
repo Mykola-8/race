@@ -16,7 +16,11 @@ html,body{margin:0;width:1920px;height:1080px;background:transparent;overflow:hi
 .rows{position:relative;background:var(--bg);overflow:hidden;transition:height .5s;border-radius:0 0 8px 8px}
 .row{position:absolute;left:0;right:0;height:40px;display:flex;align-items:center;gap:10px;padding:0 12px;font-size:20px;font-weight:500;
  border-bottom:1px solid rgba(255,255,255,.12);transition:transform .7s cubic-bezier(.2,.8,.2,1),background .4s,color .4s}
+.row.up{background:rgba(31,157,85,.6)}.row.dn{background:rgba(192,57,43,.5)}
 .row.fin{background:#fff;color:#111}
+.row .fl{width:34px;height:24px;display:flex;align-items:center;justify-content:center}
+.row .fl img{max-width:34px;max-height:24px;border-radius:2px;display:block}
+.row .b{width:34px;font-size:15px;opacity:.6;text-align:center}
 .row .p{width:30px;text-align:right;opacity:.75}
 .row .n{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .row .g{font-size:18px;font-variant-numeric:tabular-nums;font-family:Inter;font-weight:900}
@@ -50,14 +54,14 @@ document.title = 'Race Overlay — ' + rid;
 let off = 0; onValue(ref(db, '.info/serverTimeOffset'), s => off = s.val() || 0);
 const sNow = () => Date.now() + off;
 const $ = q => document.querySelector(q);
-let S = {cfg:{}, runners:[], laps:[], fin:[], startTs:0, stopTs:0};
+let S = {cfg:{}, runners:[], laps:[], fin:[], pos:[], startTs:0, stopTs:0};
 const fmt = ms => { const t=Math.max(0,ms),m=Math.floor(t/60000),s=Math.floor(t%60000/1000),c=Math.floor(t%1000/10); return m+':'+String(s).padStart(2,'0')+'.'+String(c).padStart(2,'0') };
 const gap = ms => ms<60000 ? '+'+(ms/1000).toFixed(1) : '+'+Math.floor(ms/60000)+':'+String(Math.floor(ms%60000/1000)).padStart(2,'0')+'.'+Math.floor(ms%1000/100);
 const elapsed = () => S.startTs ? (S.stopTs || sNow()) - S.startTs : 0;
-const els = {}; let avgKey = null;
+const els = {}; let avgKey = null, prevIdx = {};
 onValue(ref(db, 'race/track' + rid), snap => {
   const d = snap.val() || {};
-  S = { cfg: d.cfg || {}, runners: d.runners || [], laps: d.laps || [], fin: d.fin || [], startTs: d.startTs || 0, stopTs: d.stopTs || 0 };
+  S = { cfg: d.cfg || {}, runners: d.runners || [], laps: d.laps || [], fin: d.fin || [], pos: d.pos || [], startTs: d.startTs || 0, stopTs: d.stopTs || 0 };
   render();
 }, err => {
   const e = document.createElement('div');
@@ -75,20 +79,27 @@ function render(){
   $('#tt').textContent = c.title; $('#cl').textContent = c.club;
   $('#lg').style.display = c.logo ? '' : 'none'; if (c.logo) $('#lg').src = c.logo;
   const fin = S.fin, ids = new Set(S.runners.map(r => r.id));
-  const list = fin.map(f => S.runners.find(r => r.id === f.id)).filter(Boolean).concat(S.runners.filter(r => !fin.some(f => f.id === r.id)));
+  const pids = S.pos.filter(id => ids.has(id)), live = pids.map(id => S.runners.find(r => r.id === id)).concat(S.runners.filter(r => !pids.includes(r.id)));
+  const list = fin.map(f => S.runners.find(r => r.id === f.id)).filter(Boolean).concat(live.filter(r => !fin.some(f => f.id === r.id)));
   $('#rows').style.height = list.length * 40 + 'px';
   Object.keys(els).forEach(id => { if (!ids.has(id)) { els[id].remove(); delete els[id]; } });
   const lead = fin[0];
   list.forEach((r, i) => {
     let e = els[r.id];
     if (!e) { e = els[r.id] = document.createElement('div'); e.className = 'row in'; e.style.animationDelay = i*60+'ms';
-      e.innerHTML = '<span class="p"></span><span class="n"></span><span class="g"></span>'; $('#rows').appendChild(e); }
+      e.innerHTML = '<span class="p"></span><span class="b"></span><span class="fl"><img></span><span class="n"></span><span class="g"></span>'; $('#rows').appendChild(e); }
     e.style.transform = 'translateY(' + i*40 + 'px)';
-    const f = fin.find(x => x.id === r.id);
-    e.classList.toggle('fin', !!f);
-    e.children[0].textContent = r.num; e.children[1].textContent = r.name;
-    e.children[2].textContent = f ? (f === lead ? fmt(f.t) : gap(f.t - lead.t)) : '';
+    const f = fin.find(x => x.id === r.id), pv = prevIdx[r.id];
+    if (pv !== undefined && pv !== i && !f) { e._mv = i < pv ? 'up' : 'dn'; clearTimeout(e._t); e._t = setTimeout(() => { e._mv = null; render(); }, 3500); }
+    if (f) e._mv = null;
+    e.classList.toggle('fin', !!f); e.classList.toggle('up', e._mv === 'up'); e.classList.toggle('dn', e._mv === 'dn');
+    const im = e.children[2].firstChild, src = r.logo || (r.flag ? 'https://flagcdn.com/w80/' + String(r.flag).toLowerCase().trim() + '.png' : '');
+    if (src) { if (im.getAttribute('src') !== src) im.src = src; im.style.display = ''; } else { im.removeAttribute('src'); im.style.display = 'none'; }
+    e.children[2].style.display = (c.showFlags === false) ? 'none' : '';
+    e.children[0].textContent = i + 1; e.children[1].textContent = r.num; e.children[3].textContent = r.name;
+    e.children[4].textContent = f ? (f === lead ? fmt(f.t) : gap(f.t - lead.t)) : (e._mv === 'up' ? '▲' : e._mv === 'dn' ? '▼' : '');
   });
+  prevIdx = {}; list.forEach((r, i) => prevIdx[r.id] = i);
   const aw = $('#avgw');
   if (lead) {
     const k = lead.id + lead.t;
