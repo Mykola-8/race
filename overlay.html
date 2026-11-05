@@ -119,7 +119,7 @@ let S = {cfg:{}, clubs:[], orgs:[], board:{}, runners:[], laps:[], fin:[], pos:[
 const fmt = ms => { const t=Math.max(0,ms),m=Math.floor(t/60000),s=Math.floor(t%60000/1000),c=Math.floor(t%1000/10); return m+':'+String(s).padStart(2,'0')+'.'+String(c).padStart(2,'0') };
 const gap = ms => ms<60000 ? '+'+(ms/1000).toFixed(1) : '+'+Math.floor(ms/60000)+':'+String(Math.floor(ms%60000/1000)).padStart(2,'0')+'.'+Math.floor(ms%1000/100);
 const elapsed = () => S.startTs ? (S.stopTs || sNow()) - S.startTs : 0;
-const CD = {fsShow:false,fsColor:'#000000',fsDim:60,fsContain:false,fsBlur:0,winnersN:3,lgX1:8.0,lgY1:6,lgS1:1,lgX2:17.4,lgY2:6,lgS2:1,lgX3:26.7,lgY3:6,lgS3:1,lgX4:36.0,lgY4:6,lgS4:1,lgX5:45.4,lgY5:6,lgS5:1,lgX6:54.8,lgY6:6,lgS6:1,lgX7:64.1,lgY7:6,lgS7:1,lgX8:73.5,lgY8:6,lgS8:1,lgX9:82.8,lgY9:6,lgS9:1,lgX10:92.1,lgY10:6,lgS10:1,leadPace:true,leadPaceSec:6,qrShow:false,qrText:'',qrCap:'',qrX:88,qrY:50,qrScale:1,orgTitle:'Організатори забігу',listOpen:true,pageSize:10,pgFirst:30,pgNext:5,bX:50,bY:50,bScale:.9,clubSec:10,flX:50,flY:92,flScale:1,flBg:'#000000',flBgA:0,vX:50,vY:50,vScale:1,vChroma:true,vAuto:true,vKey:'#00ff00',vTol:40,vSoft:20,vUrl:'',dist:10000,firstSeg:0,lap:400,scaleL:1,scaleR:1,lx:40,ly:40,rx:40,ry:40,showL:true,showR:true,bg:'#1b2a6b',acc:'#f5a623',title:'',club:'',logo:''};
+const CD = {fsShow:false,fsOp:100,fsTop:true,fsColor:'#000000',fsDim:40,fsContain:false,fsBlur:0,winnersN:3,lgX1:8.0,lgY1:6,lgS1:1,lgX2:17.4,lgY2:6,lgS2:1,lgX3:26.7,lgY3:6,lgS3:1,lgX4:36.0,lgY4:6,lgS4:1,lgX5:45.4,lgY5:6,lgS5:1,lgX6:54.8,lgY6:6,lgS6:1,lgX7:64.1,lgY7:6,lgS7:1,lgX8:73.5,lgY8:6,lgS8:1,lgX9:82.8,lgY9:6,lgS9:1,lgX10:92.1,lgY10:6,lgS10:1,leadPace:true,leadPaceSec:6,qrShow:false,qrText:'',qrCap:'',qrX:88,qrY:50,qrScale:1,orgTitle:'Організатори забігу',listOpen:true,pageSize:10,pgFirst:30,pgNext:5,bX:50,bY:50,bScale:.9,clubSec:10,flX:50,flY:92,flScale:1,flBg:'#000000',flBgA:0,vX:50,vY:50,vScale:1,vChroma:true,vAuto:true,vKey:'#00ff00',vTol:40,vSoft:20,vUrl:'',dist:10000,firstSeg:0,lap:400,scaleL:1,scaleR:1,lx:40,ly:40,rx:40,ry:40,showL:true,showR:true,bg:'#1b2a6b',acc:'#f5a623',title:'',club:'',logo:''};
 const cfgNow = () => Object.assign({}, CD, S.cfg);
 const covered = (n, c) => n ? (c.firstSeg || c.lap) + (n - 1) * c.lap : 0;
 let loaded = false, popT = null;
@@ -163,7 +163,8 @@ function applyFs(c){
   if (src) { if (im.getAttribute('src') !== src) im.src = src; im.style.display = 'block'; im.style.objectFit = c.fsContain ? 'contain' : 'cover';
     im.style.filter = c.fsBlur > 0 ? 'blur(' + c.fsBlur + 'px)' : ''; im.style.transform = c.fsBlur > 0 ? 'scale(1.06)' : ''; f.style.background = c.fsContain ? c.fsColor : ''; }
   else { im.style.display = 'none'; im.removeAttribute('src'); f.style.background = ''; }
-  $('#fst').style.background = hexA(c.fsColor, (c.fsDim || 0) / 100);
+  $('#fst').style.background = hexA(c.fsColor, (src ? (c.fsDim ?? 40) : (c.fsOp ?? 100)) / 100);
+  f.style.zIndex = c.fsTop === false ? 0 : 100;
 }
 function applyLg(c){
   for (let i = 1; i <= 10; i++) { const d = LG[i - 1], src = M['lg' + i], s = +c['lgS' + i] || 0, im = d.firstChild;
