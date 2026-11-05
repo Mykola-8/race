@@ -58,6 +58,8 @@ html,body{margin:0;width:1920px;height:1080px;background:transparent;overflow:hi
 .qi{background:#fff;padding:14px;border-radius:14px;box-shadow:0 8px 30px rgba(0,0,0,.4)}
 .qi img{display:block;width:220px;height:220px;image-rendering:pixelated}
 .qc{margin-top:8px;background:var(--acc);color:#111;font:700 26px Oswald;text-transform:uppercase;padding:6px 14px;border-radius:8px;max-width:260px;display:inline-block}
+#FS{position:absolute;left:0;top:0;width:1920px;height:1080px;opacity:0;transition:opacity .6s;pointer-events:none;z-index:0;overflow:hidden}#FS.on{opacity:1}
+#fsimg{position:absolute;left:0;top:0;width:100%;height:100%;object-fit:cover;display:none}#fst{position:absolute;left:0;top:0;width:100%;height:100%}
 .lgi{position:absolute;opacity:0;pointer-events:none;transition:opacity .5s;z-index:3}.lgi.on{opacity:1}
 .lgi img{display:block;height:100px;width:auto}
 .pod{display:flex;justify-content:center;align-items:flex-end;gap:18px;padding:30px 22px 26px;min-height:470px}
@@ -88,7 +90,7 @@ html,body{margin:0;width:1920px;height:1080px;background:transparent;overflow:hi
 .br.org .nm{font-weight:700}
 .dots{display:flex;gap:8px;justify-content:center;padding:12px}
 .dots i{width:10px;height:10px;border-radius:5px;background:rgba(255,255,255,.3);transition:.3s}.dots i.on{background:var(--acc);width:28px}
-</style></head><body>
+</style></head><body><div id="FS"><img id="fsimg"><div id="fst"></div></div>
 <div id="FL" class="fx"><img id="fli"></div><div id="MV" class="fx"><video id="mv" muted loop playsinline autoplay></video><canvas id="mc"></canvas></div>
 <div class="box" id="L"><div class="rows" id="rows"></div><div class="hd"><img id="lg"><span id="tt"></span><span class="cl" id="cl"></span></div></div>
 <div class="box" id="R"><div class="pop" id="pop"><div class="pr"><span>⟲ КОЛО</span><b id="pl"></b></div><div class="pr pm" id="pd"></div><div class="pr last"><span id="pg"></span><b id="pe"></b></div></div><div id="Rin"><div id="avgw"></div><div id="dt"><div class="dr" id="d1"><div class="sm"><span>Останнє коло</span><b></b></div></div><div class="dr" id="d2"><div class="sm"><span>Серед. швидкість</span><b></b></div></div><div class="dr" id="d3"><div class="sm"><span>Серед. темп</span><b></b></div></div><div class="dr" id="d4"><div class="sm"><span>Темп кола</span><b></b></div></div></div><div class="rp"><div class="big" id="tm">0:00</div></div><div class="hd"><span>ЧАС</span><span class="cl" id="lapn"></span></div></div></div>
@@ -117,7 +119,7 @@ let S = {cfg:{}, clubs:[], orgs:[], board:{}, runners:[], laps:[], fin:[], pos:[
 const fmt = ms => { const t=Math.max(0,ms),m=Math.floor(t/60000),s=Math.floor(t%60000/1000),c=Math.floor(t%1000/10); return m+':'+String(s).padStart(2,'0')+'.'+String(c).padStart(2,'0') };
 const gap = ms => ms<60000 ? '+'+(ms/1000).toFixed(1) : '+'+Math.floor(ms/60000)+':'+String(Math.floor(ms%60000/1000)).padStart(2,'0')+'.'+Math.floor(ms%1000/100);
 const elapsed = () => S.startTs ? (S.stopTs || sNow()) - S.startTs : 0;
-const CD = {winnersN:3,lgX1:8.0,lgY1:6,lgS1:1,lgX2:17.4,lgY2:6,lgS2:1,lgX3:26.7,lgY3:6,lgS3:1,lgX4:36.0,lgY4:6,lgS4:1,lgX5:45.4,lgY5:6,lgS5:1,lgX6:54.8,lgY6:6,lgS6:1,lgX7:64.1,lgY7:6,lgS7:1,lgX8:73.5,lgY8:6,lgS8:1,lgX9:82.8,lgY9:6,lgS9:1,lgX10:92.1,lgY10:6,lgS10:1,leadPace:true,leadPaceSec:6,qrShow:false,qrText:'',qrCap:'',qrX:88,qrY:50,qrScale:1,orgTitle:'Організатори забігу',listOpen:true,pageSize:10,pgFirst:30,pgNext:5,bX:50,bY:50,bScale:.9,clubSec:10,flX:50,flY:92,flScale:1,flBg:'#000000',flBgA:0,vX:50,vY:50,vScale:1,vChroma:true,vAuto:true,vKey:'#00ff00',vTol:40,vSoft:20,vUrl:'',dist:10000,firstSeg:0,lap:400,scaleL:1,scaleR:1,lx:40,ly:40,rx:40,ry:40,showL:true,showR:true,bg:'#1b2a6b',acc:'#f5a623',title:'',club:'',logo:''};
+const CD = {fsShow:false,fsColor:'#000000',fsDim:60,fsContain:false,fsBlur:0,winnersN:3,lgX1:8.0,lgY1:6,lgS1:1,lgX2:17.4,lgY2:6,lgS2:1,lgX3:26.7,lgY3:6,lgS3:1,lgX4:36.0,lgY4:6,lgS4:1,lgX5:45.4,lgY5:6,lgS5:1,lgX6:54.8,lgY6:6,lgS6:1,lgX7:64.1,lgY7:6,lgS7:1,lgX8:73.5,lgY8:6,lgS8:1,lgX9:82.8,lgY9:6,lgS9:1,lgX10:92.1,lgY10:6,lgS10:1,leadPace:true,leadPaceSec:6,qrShow:false,qrText:'',qrCap:'',qrX:88,qrY:50,qrScale:1,orgTitle:'Організатори забігу',listOpen:true,pageSize:10,pgFirst:30,pgNext:5,bX:50,bY:50,bScale:.9,clubSec:10,flX:50,flY:92,flScale:1,flBg:'#000000',flBgA:0,vX:50,vY:50,vScale:1,vChroma:true,vAuto:true,vKey:'#00ff00',vTol:40,vSoft:20,vUrl:'',dist:10000,firstSeg:0,lap:400,scaleL:1,scaleR:1,lx:40,ly:40,rx:40,ry:40,showL:true,showR:true,bg:'#1b2a6b',acc:'#f5a623',title:'',club:'',logo:''};
 const cfgNow = () => Object.assign({}, CD, S.cfg);
 const covered = (n, c) => n ? (c.firstSeg || c.lap) + (n - 1) * c.lap : 0;
 let loaded = false, popT = null;
@@ -155,13 +157,21 @@ function applyQr(c){
   $('#qcap').style.display = c.qrCap ? 'inline-block' : 'none'; $('#qcap').textContent = c.qrCap || '';
   q.classList.add('on');
 }
+function applyFs(c){
+  const f = $('#FS'), im = $('#fsimg'), src = M.fs || '';
+  f.classList.toggle('on', c.fsShow === true);
+  if (src) { if (im.getAttribute('src') !== src) im.src = src; im.style.display = 'block'; im.style.objectFit = c.fsContain ? 'contain' : 'cover';
+    im.style.filter = c.fsBlur > 0 ? 'blur(' + c.fsBlur + 'px)' : ''; im.style.transform = c.fsBlur > 0 ? 'scale(1.06)' : ''; f.style.background = c.fsContain ? c.fsColor : ''; }
+  else { im.style.display = 'none'; im.removeAttribute('src'); f.style.background = ''; }
+  $('#fst').style.background = hexA(c.fsColor, (c.fsDim || 0) / 100);
+}
 function applyLg(c){
   for (let i = 1; i <= 10; i++) { const d = LG[i - 1], src = M['lg' + i], s = +c['lgS' + i] || 0, im = d.firstChild;
     if (src && s > 0) { if (im.getAttribute('src') !== src) im.src = src; d.style.left = c['lgX' + i] * 19.2 + 'px'; d.style.top = c['lgY' + i] * 10.8 + 'px';
       d.style.transform = 'translate(-50%,-50%) scale(' + s + ')'; d.classList.add('on'); } else d.classList.remove('on'); }
 }
 function applyFx(c){
-  applyQr(c); applyLg(c);
+  applyFs(c); applyQr(c); applyLg(c);
   const fl = $('#FL'), im = $('#fli'), s = +c.flScale || 0;
   if (M.logo && s > 0) {
     if (im.getAttribute('src') !== M.logo) im.src = M.logo;
