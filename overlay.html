@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="uk"><head><meta charset="UTF-8">
-<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Inter:wght@700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Inter:wght@700;900&family=Bebas+Neue&family=Playfair+Display:wght@700&family=Rubik:wght@500;700&display=swap" rel="stylesheet">
 <title>Race Overlay</title>
 <style>
 :root{--bg:rgba(27,42,107,.92);--acc:#f5a623;--lx:40px;--ly:40px;--rx:40px;--ry:40px}
@@ -21,7 +21,7 @@ html,body{margin:0;width:100vw;height:100vh;background:transparent;overflow:hidd
 .row.fin{background:#fff;color:#111}
 .row .fl{width:34px;height:24px;display:flex;align-items:center;justify-content:center}
 .row .fl img{max-width:34px;max-height:24px;border-radius:2px;display:block}
-.row .b{width:34px;font-size:15px;opacity:.6;text-align:center}
+.row .b{width:54px;font-size:26px;font-weight:700;opacity:1;text-align:center;color:var(--acc)}
 .row .p{width:30px;text-align:right;opacity:.75}
 .row .n{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .row .g{font-size:18px;font-variant-numeric:tabular-nums;font-family:Inter;font-weight:900}
@@ -82,7 +82,7 @@ html,body{margin:0;width:100vw;height:100vh;background:transparent;overflow:hidd
 .bc{height:34px;font:900 14px Inter;opacity:.7;border-bottom:1px solid rgba(255,255,255,.2)}
 .br{height:var(--rh,42px);font-size:var(--fs,24px);font-weight:500;border-bottom:1px solid rgba(255,255,255,.1)}
 .br.w1{background:#fff;color:#111}
-.br .pn{opacity:.8;text-align:right}
+.br .pn{opacity:1;font-weight:700;font-size:1.15em;text-align:right}
 .br .nm,.br .cb{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .br .bf img{max-width:44px;max-height:28px;border-radius:2px;display:block}
 .r{text-align:right}.br .t{font:900 .85em Inter;font-variant-numeric:tabular-nums}
@@ -96,8 +96,40 @@ html,body{margin:0;width:100vw;height:100vh;background:transparent;overflow:hidd
 #bi .bc{height:calc(34px*var(--ts,1));font-size:calc(14px*var(--ts,1))}
 #bi .pl{font-size:calc(74px*var(--ts,1))}#bi .pnm{font-size:calc(30px*var(--ts,1))}#bi .pt{font-size:calc(30px*var(--ts,1))}#bi .pcl,#bi .pp{font-size:calc(16px*var(--ts,1))}
 #L .hd{font-size:calc(22px*var(--tsL,1))}
-#L .row{font-size:calc(20px*var(--tsL,1))}#L .row .g{font-size:calc(18px*var(--tsL,1))}#L .row .g.lp{font-size:calc(15px*var(--tsL,1))}#L .row .b{font-size:calc(15px*var(--tsL,1))}
+#L .row{font-size:calc(20px*var(--tsL,1))}#L .row .g{font-size:calc(18px*var(--tsL,1))}#L .row .g.lp{font-size:calc(15px*var(--tsL,1))}#L .row .b{font-size:calc(26px*var(--tsL,1));width:calc(54px*var(--tsL,1))}
 #R .hd{font-size:calc(22px*var(--tsR,1))}#R .big{font-size:calc(54px*var(--tsR,1))}#R .sm{font-size:calc(16px*var(--tsR,1))}
+.box,#bi,#QR{color:var(--tx,#fff);font-family:var(--font,'Oswald',sans-serif)}
+.hd,.avg,.pop .last,.bh,.qc{color:var(--atx,#111)}
+.row.fin,.br.w1{background:var(--finbg,#fff);color:var(--fintx,#111)}
+.row{border-bottom-color:var(--sep,rgba(255,255,255,.12))}.br{border-bottom-color:var(--sep,rgba(255,255,255,.1))}
+#L .hd{border-radius:0 0 var(--rad,8px) var(--rad,8px)}.rows{border-radius:var(--rad,8px) var(--rad,8px) 0 0}
+#Rin,#bi,.pop{border-radius:var(--rad,8px)}.pc{border-radius:var(--rad,8px);background:var(--cardbg,rgba(255,255,255,.08))}
+.rows,#Rin,.pop,#bi{background:var(--bg);backdrop-filter:var(--blur,none);-webkit-backdrop-filter:var(--blur,none)}
+#dt,#R .rp{background:transparent}
+#L,#R,#bi{filter:var(--glow,none)}
+.dots i{background:var(--dot,rgba(255,255,255,.3))}
+.box{clip-path:inset(-80px);transition:opacity .5s,transform .6s cubic-bezier(.2,.8,.2,1),translate .6s,clip-path .7s ease}
+@keyframes rCenter{from{opacity:0;clip-path:inset(0 50% 0 50%)}to{opacity:1;clip-path:inset(-80px)}}
+@keyframes rFade{from{opacity:0}to{opacity:1}}
+@keyframes rZoom{from{opacity:0;scale:.5}to{opacity:1;scale:1}}
+@keyframes rBounce{from{opacity:0;translate:0 50px}60%{opacity:1;translate:0 -8px}to{opacity:1;translate:0 0}}
+body[data-anim=center] .box.off{translate:0 0;clip-path:inset(-80px 50% -80px 50%)}
+body[data-anim=fade] .box.off{translate:0 0}
+body[data-anim=zoom] .box.off{translate:0 0;transform:scale(.6)}
+body[data-anim=bounce] .box.off{translate:0 120px}
+body[data-anim=bounce] .box{transition-timing-function:cubic-bezier(.34,1.56,.64,1)}
+body[data-anim=center] .row.in,body[data-anim=center] .anim .br{animation:rCenter .7s ease both}
+body[data-anim=center] #bi.anim{animation:rCenter .8s ease both}
+body[data-anim=center] .anim .pc{animation-name:rCenter}
+body[data-anim=fade] .row.in,body[data-anim=fade] .anim .br{animation:rFade .7s ease both}
+body[data-anim=fade] #bi.anim{animation:rFade .8s ease both}
+body[data-anim=fade] .anim .pc{animation-name:rFade}
+body[data-anim=zoom] .row.in,body[data-anim=zoom] .anim .br{animation:rZoom .7s ease both}
+body[data-anim=zoom] #bi.anim{animation:rZoom .8s ease both}
+body[data-anim=zoom] .anim .pc{animation-name:rZoom}
+body[data-anim=bounce] .row.in,body[data-anim=bounce] .anim .br{animation:rBounce .7s ease both}
+body[data-anim=bounce] #bi.anim{animation:rBounce .8s ease both}
+body[data-anim=bounce] .anim .pc{animation-name:rBounce}
 </style></head><body><div id="FS"><img id="fsimg"><div id="fst"></div></div><div id="stage">
 <div id="FL" class="fx"><img id="fli"></div><div id="MV" class="fx"><video id="mv" muted loop playsinline autoplay></video><canvas id="mc"></canvas></div>
 <div class="box" id="L"><div class="rows" id="rows"></div><div class="hd"><img id="lg"><span id="tt"></span><span class="cl" id="cl"></span></div></div>
@@ -128,19 +160,19 @@ let S = {cfg:{}, clubs:[], orgs:[], board:{}, runners:[], laps:[], fin:[], pos:[
 const fmt = ms => { const t=Math.max(0,ms),m=Math.floor(t/60000),s=Math.floor(t%60000/1000),c=Math.floor(t%1000/10); return m+':'+String(s).padStart(2,'0')+'.'+String(c).padStart(2,'0') };
 const gap = ms => ms<60000 ? '+'+(ms/1000).toFixed(1) : '+'+Math.floor(ms/60000)+':'+String(Math.floor(ms%60000/1000)).padStart(2,'0')+'.'+Math.floor(ms%1000/100);
 const elapsed = () => S.startTs ? (S.stopTs || sNow()) - S.startTs : 0;
-const CD = {hideLogos:false,hideMascot:false,tsL:1,tsR:1,rsX:50,rsY:50,rsS:.9,rsT:1,cbX:50,cbY:50,cbS:.9,cbT:1,ogX:50,ogY:50,ogS:.9,ogT:1,wnX:50,wnY:50,wnS:.9,wnT:1,fsShow:false,fsOp:100,fsTop:true,fsColor:'#000000',fsDim:40,fsFit:'fill',fsBlur:0,winnersN:3,lgX1:8.0,lgY1:6,lgS1:1,lgX2:17.4,lgY2:6,lgS2:1,lgX3:26.7,lgY3:6,lgS3:1,lgX4:36.0,lgY4:6,lgS4:1,lgX5:45.4,lgY5:6,lgS5:1,lgX6:54.8,lgY6:6,lgS6:1,lgX7:64.1,lgY7:6,lgS7:1,lgX8:73.5,lgY8:6,lgS8:1,lgX9:82.8,lgY9:6,lgS9:1,lgX10:92.1,lgY10:6,lgS10:1,leadPace:true,leadPaceSec:6,qrShow:false,qrText:'',qrCap:'',qrX:88,qrY:50,qrScale:1,orgTitle:'Організатори забігу',listOpen:true,pageSize:10,pgFirst:30,pgNext:5,bX:50,bY:50,bScale:.9,clubSec:10,flX:50,flY:92,flScale:1,flBg:'#000000',flBgA:0,vX:50,vY:50,vScale:1,vChroma:true,vAuto:true,vKey:'#00ff00',vTol:40,vSoft:20,vUrl:'',dist:10000,firstSeg:0,lap:400,scaleL:1,scaleR:1,lx:40,ly:40,rx:40,ry:40,showL:true,showR:true,bg:'#1b2a6b',acc:'#f5a623',title:'',club:'',logo:''};
+const CD = {theme:'custom',anim:'slide',listShowSec:60,listAuto:true,hideLogos:false,hideMascot:false,tsL:1,tsR:1,rsX:50,rsY:50,rsS:.9,rsT:1,cbX:50,cbY:50,cbS:.9,cbT:1,ogX:50,ogY:50,ogS:.9,ogT:1,wnX:50,wnY:50,wnS:.9,wnT:1,fsShow:false,fsOp:100,fsTop:true,fsColor:'#000000',fsDim:40,fsFit:'fill',fsBlur:0,winnersN:3,lgX1:8.0,lgY1:6,lgS1:1,lgX2:17.4,lgY2:6,lgS2:1,lgX3:26.7,lgY3:6,lgS3:1,lgX4:36.0,lgY4:6,lgS4:1,lgX5:45.4,lgY5:6,lgS5:1,lgX6:54.8,lgY6:6,lgS6:1,lgX7:64.1,lgY7:6,lgS7:1,lgX8:73.5,lgY8:6,lgS8:1,lgX9:82.8,lgY9:6,lgS9:1,lgX10:92.1,lgY10:6,lgS10:1,leadPace:true,leadPaceSec:6,qrShow:false,qrText:'',qrCap:'',qrX:88,qrY:50,qrScale:1,orgTitle:'Організатори забігу',listOpen:true,pageSize:10,pgFirst:30,pgNext:5,bX:50,bY:50,bScale:.9,clubSec:10,flX:50,flY:92,flScale:1,flBg:'#000000',flBgA:0,vX:50,vY:50,vScale:1,vChroma:true,vAuto:true,vKey:'#00ff00',vTol:40,vSoft:20,vUrl:'',dist:10000,firstSeg:0,lap:400,scaleL:1,scaleR:1,lx:40,ly:40,rx:40,ry:40,showL:true,showR:true,bg:'#1b2a6b',acc:'#f5a623',title:'',club:'',logo:''};
 const cfgNow = () => Object.assign({}, CD, S.cfg);
 const covered = (n, c) => n ? Math.min(c.dist, (c.firstSeg || c.lap) + (n - 1) * c.lap) : 0;
 let loaded = false, popT = null;
 const LG = []; for (let i = 1; i <= 10; i++) { const d = document.createElement('div'); d.className = 'lgi'; d.appendChild(document.createElement('img')); $('#stage').appendChild(d); LG.push(d); }
-let M = {}, curVid = '', mvOn = false, prevShowL, prevOpen, bKey = '', bPage = -1, curLP = 0, anchor0 = 0, lpUntil = 0, lpT = null;
+let M = {}, curVid = '', mvOn = false, prevShowL, prevOpen, bKey = '', bPage = -1, curLP = 0, anchor0 = 0, lpUntil = 0, lpT = null, lOpen = true, lT = null, prevCfgOpen;
 const els = {}; let avgKey = null, prevIdx = {};
 onValue(ref(db, 'race/track' + rid), snap => {
   const d = snap.val() || {};
   const prevN = S.laps.length;
   S = { cfg: d.cfg || {}, runners: d.runners || [], laps: d.laps || [], fin: d.fin || [], pos: d.pos || [], board: d.board || {}, orgs: d.orgs || [], clubs: d.clubs || [], startTs: d.startTs || 0, stopTs: d.stopTs || 0 };
   const lapped = loaded && S.laps.length > prevN;
-  if (lapped) { const cc = cfgNow(), sec = cc.leadPaceSec === undefined ? 6 : +cc.leadPaceSec; lpUntil = Date.now() + sec * 1000; clearTimeout(lpT); if (sec > 0) lpT = setTimeout(render, sec * 1000 + 80); }
+  if (lapped) { openList(); const cc = cfgNow(), sec = cc.leadPaceSec === undefined ? 6 : +cc.leadPaceSec; lpUntil = Date.now() + sec * 1000; clearTimeout(lpT); if (sec > 0) lpT = setTimeout(render, sec * 1000 + 80); }
   render();
   if (lapped) showPop();
   if (!anchor0) anchor0 = sNow();
@@ -174,6 +206,27 @@ function applyFs(c){
   else { im.style.display = 'none'; im.removeAttribute('src'); f.style.background = ''; }
   $('#fst').style.background = hexA(c.fsColor, (src ? (c.fsDim ?? 40) : (c.fsOp ?? 100)) / 100);
   f.style.zIndex = c.fsTop === false ? 0 : 100;
+}
+const TH = {
+  navy:{bg:'linear-gradient(160deg,#17236b,#0f1a4d)',acc:'#f5a623'},
+  light:{bg:'rgba(255,255,255,.96)',acc:'#0a58ff',tx:'#101828',atx:'#fff',finbg:'#dbe7ff',fintx:'#0b1b4d',sep:'rgba(0,0,0,.12)',cardbg:'rgba(0,0,0,.06)',dot:'rgba(0,0,0,.25)',font:"'Rubik',sans-serif",rad:'12px'},
+  neon:{bg:'rgba(6,6,20,.92)',acc:'#00e5ff',tx:'#e8fbff',atx:'#001018',finbg:'#ff2bd6',fintx:'#fff',sep:'rgba(0,229,255,.25)',font:"'Bebas Neue',sans-serif",rad:'4px',glow:'drop-shadow(0 0 10px rgba(0,229,255,.55))'},
+  gold:{bg:'linear-gradient(160deg,#141414,#2a2310)',acc:'#d4af37',tx:'#f6e9b8',atx:'#1a1405',finbg:'#d4af37',fintx:'#1a1405',sep:'rgba(212,175,55,.3)',font:"'Playfair Display',serif",rad:'2px'},
+  glass:{bg:'rgba(20,28,48,.5)',acc:'rgba(255,255,255,.85)',tx:'#fff',atx:'#0b1220',finbg:'rgba(255,255,255,.85)',fintx:'#0b1220',sep:'rgba(255,255,255,.18)',blur:'blur(14px)',font:"'Rubik',sans-serif",rad:'16px'},
+  fire:{bg:'linear-gradient(160deg,#4a0a0a,#2a0505)',acc:'#ff3b30',tx:'#fff',atx:'#fff',finbg:'#ffd166',fintx:'#2a0505',sep:'rgba(255,255,255,.15)',font:"'Bebas Neue',sans-serif",rad:'6px'},
+  forest:{bg:'linear-gradient(160deg,#0f3d2e,#0a2a20)',acc:'#9be564',tx:'#f1fff0',atx:'#0a2a20',finbg:'#9be564',fintx:'#0a2a20',sep:'rgba(255,255,255,.14)',rad:'10px'},
+  sunset:{bg:'linear-gradient(135deg,#3a1c71,#8e2de2 60%,#d76d77)',acc:'#ffaf7b',tx:'#fff',atx:'#2a0f3a',finbg:'#ffaf7b',fintx:'#2a0f3a',sep:'rgba(255,255,255,.2)',font:"'Rubik',sans-serif",rad:'14px'}
+};
+function applyTheme(c){
+  const d = { tx:'#fff', atx:'#111', finbg:'#fff', fintx:'#111', sep:'rgba(255,255,255,.12)', cardbg:'rgba(255,255,255,.08)', dot:'rgba(255,255,255,.3)', rad:'8px', font:"'Oswald',sans-serif", blur:'none', glow:'none' };
+  const v = Object.assign(d, { bg: c.bg, acc: c.acc }, TH[c.theme] || {}), st = document.documentElement.style;
+  Object.keys(v).forEach(k => st.setProperty('--' + k, v[k]));
+  document.body.dataset.anim = c.anim || 'slide';
+}
+function openList(){
+  const c = cfgNow(); lOpen = true; clearTimeout(lT);
+  const sec = c.listShowSec === undefined ? 60 : +c.listShowSec;
+  if (c.listAuto !== false && sec > 0) lT = setTimeout(() => { lOpen = false; render(); }, sec * 1000 + 50);
 }
 function applyLg(c){
   for (let i = 1; i <= 10; i++) { const d = LG[i - 1], src = M['lg' + i], s = +c['lgS' + i] || 0, im = d.firstChild;
@@ -224,7 +277,8 @@ function ordered(){
 }
 function clubsList(){
   const out = [];
-  S.runners.forEach(r => { const k = String(r.club || '').trim(); if (!k) return; let g = out.find(x => x.n === k); if (!g) { g = { n: k, list: [] }; out.push(g); } g.list.push(r); });
+  S.runners.forEach(r => { const k = String(r.club || '').trim() || 'Без клубу'; let g = out.find(x => x.n === k); if (!g) { g = { n: k, list: [] }; out.push(g); } g.list.push(r); });
+  out.sort((a, b) => (a.n === 'Без клубу') - (b.n === 'Без клубу'));
   return out;
 }
 const mk = (t, cl, tx) => { const e = document.createElement(t); if (cl) e.className = cl; if (tx !== undefined) e.textContent = tx; return e; };
@@ -241,14 +295,14 @@ function renderBoard(){
   const key = b.mode + ':' + (b.ts || 0) + ':' + page, anim = key !== bKey; bKey = key; bPage = page;
   bi.innerHTML = ''; bi.className = anim ? 'anim' : '';
   if (b.mode === 'results') {
-    const rows = ordered(), hasClub = S.runners.some(r => r.club), n = rows.length, rh = Math.max(26, Math.min(42, Math.floor(860 / Math.max(1, n))));
+    const rows = ordered(), hasClub = S.runners.some(r => r.club), anyF = S.runners.some(r => logoOf(r) || r.flag) && c.showFlags !== false, n = rows.length, rh = Math.max(26, Math.min(42, Math.floor(860 / Math.max(1, n))));
     bi.style.setProperty('--rh', rh * ts + 'px'); bi.style.setProperty('--fs', Math.round(rh * .56 * ts) + 'px');
-    bi.style.setProperty('--cols', '56px 48px 1fr ' + (hasClub ? '220px ' : '') + '150px 140px');
+    bi.style.setProperty('--cols', '56px ' + (anyF ? '48px ' : '') + '1fr ' + (hasClub ? '220px ' : '') + '150px 140px');
     const hd = mk('div', 'bh'); hd.appendChild(mk('span', '', 'Результати · ' + (c.title || ''))); hd.appendChild(mk('small', '', 'Дистанція ' + c.dist + ' м')); bi.appendChild(hd);
-    const ch = mk('div', 'bc'), heads = ['№', '', 'Учасник'].concat(hasClub ? ['Клуб'] : [], ['Результат', 'Серед. темп']);
+    const ch = mk('div', 'bc'), heads = ['№'].concat(anyF ? [''] : [], ['Учасник'], hasClub ? ['Клуб'] : [], ['Результат', 'Серед. темп']);
     heads.forEach((t, i) => ch.appendChild(mk('span', i >= heads.length - 2 ? 'r' : '', t))); bi.appendChild(ch);
     rows.forEach((x, i) => { const rw = mk('div', 'br' + (i === 0 && x.t != null ? ' w1' : '')); rw.style.animationDelay = i * 55 + 'ms';
-      rw.appendChild(mk('span', 'pn', i + 1)); rw.appendChild(flagEl(x.r, c)); rw.appendChild(mk('span', 'nm', x.r.name));
+      rw.appendChild(mk('span', 'pn', i + 1)); if (anyF) rw.appendChild(flagEl(x.r, c)); rw.appendChild(mk('span', 'nm', x.r.name));
       if (hasClub) rw.appendChild(mk('span', 'cb', x.r.club || ''));
       rw.appendChild(mk('span', 'r t', x.t != null ? fmt(x.t) : '—')); rw.appendChild(mk('span', 'r t', x.t != null ? paceG(x.t, c.dist) : '—')); bi.appendChild(rw); });
   } else if (b.mode === 'winners') {
@@ -272,11 +326,13 @@ function renderBoard(){
     list.forEach((x, i) => { const rw = mk('div', 'br org'); rw.style.animationDelay = i * 90 + 'ms';
       rw.appendChild(mk('span', 'rl', x.role || '')); rw.appendChild(mk('span', 'nm', x.name || '')); bi.appendChild(rw); });
   } else {
-    bi.style.setProperty('--rh', 52 * ts + 'px'); bi.style.setProperty('--fs', Math.round(28 * ts) + 'px'); bi.style.setProperty('--cols', '70px 56px 1fr');
+    bi.style.setProperty('--rh', 52 * ts + 'px'); bi.style.setProperty('--fs', Math.round(28 * ts) + 'px'); const anyF = S.runners.some(r => logoOf(r) || r.flag) && c.showFlags !== false; bi.style.setProperty('--cols', '70px ' + (anyF ? '56px ' : '') + '1fr');
     if (!clubs.length) { bi.appendChild(mk('div', 'bh', 'Вкажіть клуби учасників')); return; }
-    const g = clubs[page], hd = mk('div', 'bh'); hd.appendChild(mk('span', '', g.n)); hd.appendChild(mk('small', '', (page + 1) + ' / ' + clubs.length)); bi.appendChild(hd);
+    const g = clubs[page], hd = mk('div', 'bh'); const hs = mk('span', '', g.n), cl0 = (S.clubs || []).find(x => x.n === g.n);
+    if (cl0 && cl0.logo && !c.hideLogos) { const im = document.createElement('img'); im.src = cl0.logo; im.style.cssText = 'height:44px;margin-right:12px;vertical-align:middle'; hs.prepend(im); }
+    hd.appendChild(hs); hd.appendChild(mk('small', '', (page + 1) + ' / ' + clubs.length)); bi.appendChild(hd);
     g.list.forEach((r, i) => { const rw = mk('div', 'br'); rw.style.animationDelay = i * 70 + 'ms';
-      rw.appendChild(mk('span', 'pn', r.num)); rw.appendChild(flagEl(r, c)); rw.appendChild(mk('span', 'nm', r.name)); bi.appendChild(rw); });
+      rw.appendChild(mk('span', 'pn', r.num)); if (anyF) rw.appendChild(flagEl(r, c)); rw.appendChild(mk('span', 'nm', r.name)); bi.appendChild(rw); });
     const dots = mk('div', 'dots'); clubs.forEach((_, i) => dots.appendChild(mk('i', i === page ? 'on' : ''))); bi.appendChild(dots);
   }
 }
@@ -297,10 +353,14 @@ function showPop(){
 }
 function render(){
   const c = cfgNow();
-  applyFx(c); const reanim = (c.showL && prevShowL === false) || (c.listOpen !== false && prevOpen === false); prevShowL = c.showL; prevOpen = c.listOpen !== false;
+  applyFx(c); const co = c.listOpen !== false;
+  if (prevCfgOpen !== co) { if (co) openList(); else { lOpen = false; clearTimeout(lT); } prevCfgOpen = co; }
+  if (c.showL && prevShowL === false && co) openList();
+  const effOpen = c.listAuto !== false ? lOpen : co;
+  const reanim = (c.showL && prevShowL === false) || (effOpen && prevOpen === false); prevShowL = c.showL; prevOpen = effOpen;
   renderBoard();
   const st = document.documentElement.style;
-  st.setProperty('--bg', c.bg); st.setProperty('--acc', c.acc); st.setProperty('--tsL', c.tsL || 1); st.setProperty('--tsR', c.tsR || 1);
+  applyTheme(c); st.setProperty('--tsL', c.tsL || 1); st.setProperty('--tsR', c.tsR || 1);
   ['lx','ly','rx','ry'].forEach(k => st.setProperty('--'+k, c[k]+'px'));
   $('#L').style.scale = c.scaleL; $('#R').style.scale = c.scaleR;
   $('#L').classList.toggle('off', !c.showL); $('#R').classList.toggle('off', !c.showR);
@@ -309,10 +369,11 @@ function render(){
   const fin = S.fin, ids = new Set(S.runners.map(r => r.id));
   const pids = S.pos.filter(id => ids.has(id)), live = pids.map(id => S.runners.find(r => r.id === id)).concat(S.runners.filter(r => !pids.includes(r.id)));
   const list = fin.map(f => S.runners.find(r => r.id === f.id)).filter(Boolean).concat(live.filter(r => !fin.some(f => f.id === r.id)));
-  const size = Math.max(3, +c.pageSize || 10), lp = listPage(c), vis = Math.max(0, Math.min(size, list.length - lp * size)), open = c.listOpen !== false;
+  const size = Math.max(3, +c.pageSize || 10), lp = listPage(c), vis = Math.max(0, Math.min(size, list.length - lp * size)), open = effOpen;
   curLP = lp; $('#rows').style.height = (open ? vis * 40 : 0) + 'px'; $('#rows').classList.toggle('shut', !open);
   Object.keys(els).forEach(id => { if (!ids.has(id)) { els[id].remove(); delete els[id]; } });
-  const lead = fin[0];
+  const lead = fin[0], anyFlag = S.runners.some(r => logoOf(r) || r.flag);
+  let moved = false;
   const nLaps = S.laps.length, lpSec = c.leadPaceSec === undefined ? 6 : +c.leadPaceSec;
   const showLP = nLaps > 0 && c.leadPace !== false && (lpSec === 0 || Date.now() < lpUntil);
   const leadRun = list.find(r => !fin.some(x => x.id === r.id)), lpTxt = showLP && leadRun ? avgPaceNow(c) : null;
@@ -327,12 +388,12 @@ function render(){
     e.style.setProperty('--from', ((vis - li) * 40 + 20) + 'px');
     if (reanim) { e.classList.remove('in'); void e.offsetWidth; e.classList.add('in'); }
     const f = fin.find(x => x.id === r.id), pv = prevIdx[r.id];
-    if (pv !== undefined && pv !== i && !f) { e._mv = i < pv ? 'up' : 'dn'; clearTimeout(e._t); e._t = setTimeout(() => { e._mv = null; render(); }, 3500); }
+    if (pv !== undefined && pv !== i && !f) { moved = true; e._mv = i < pv ? 'up' : 'dn'; clearTimeout(e._t); e._t = setTimeout(() => { e._mv = null; render(); }, 3500); }
     if (f) e._mv = null;
     e.classList.toggle('fin', !!f); e.classList.toggle('up', e._mv === 'up'); e.classList.toggle('dn', e._mv === 'dn');
     const im = e.children[2].firstChild, src = logoOf(r) || (r.flag ? 'https://flagcdn.com/w80/' + String(r.flag).toLowerCase().trim() + '.png' : '');
     if (src) { if (im.getAttribute('src') !== src) im.src = src; im.style.display = ''; } else { im.removeAttribute('src'); im.style.display = 'none'; }
-    e.children[2].style.display = (c.showFlags === false) ? 'none' : '';
+    e.children[2].style.display = (c.showFlags === false || !anyFlag) ? 'none' : '';
     e.children[0].textContent = i + 1; e.children[1].textContent = r.num; e.children[3].textContent = r.name;
     const gEl = e.children[4];
     e.children[4].textContent = f ? (f === lead ? fmt(f.t) : gap(f.t - lead.t)) : (e._mv === 'up' ? '▲' : e._mv === 'dn' ? '▼' : '');
@@ -342,6 +403,7 @@ function render(){
     gEl.classList.toggle('lp', isLP);
   });
   prevIdx = {}; list.forEach((r, i) => prevIdx[r.id] = i);
+  if (moved && c.listAuto !== false && co) { const was = lOpen; openList(); if (!was) render(); }
   const aw = $('#avgw');
   if (lead) {
     const k = lead.id + lead.t;
