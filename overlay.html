@@ -159,6 +159,8 @@ body[data-anim=bounce] .anim .ii{animation:rBounce .7s ease both}
 .wxt{font:700 46px Oswald;font-variant-numeric:tabular-nums;line-height:1;color:var(--acc)}
 .wxm{display:flex;align-items:center;gap:10px}.wxi{font-size:42px;line-height:1}
 .wxd b{font:700 36px Oswald;display:block;line-height:1}.wxd small{display:block;font:500 15px Inter;opacity:.85;margin-top:3px;text-transform:none}
+.br.rule{height:auto;min-height:var(--rh);padding-top:8px;padding-bottom:8px;align-items:flex-start}.br.rule .nm{white-space:normal;overflow:visible}
+.br.rule .rl{font:900 .8em Inter;color:var(--acc);font-variant-numeric:tabular-nums;padding-top:.15em}
 </style></head><body><div id="FS"><img id="fsimg"><div id="fst"></div></div><div id="stage">
 <div id="FL" class="fx"><img id="fli"></div><div id="MV" class="fx"><video id="mv" muted loop playsinline autoplay></video><canvas id="mc"></canvas></div>
 <div class="box" id="L"><div class="rows" id="rows"></div><div class="hd"><img id="lg"><span id="tt"></span><span class="cl" id="cl"></span></div></div>
@@ -186,11 +188,11 @@ document.title = 'Race Overlay — ' + rid;
 let off = 0; onValue(ref(db, '.info/serverTimeOffset'), s => off = s.val() || 0);
 const sNow = () => Date.now() + off;
 const $ = q => document.querySelector(q);
-let S = {cfg:{}, clubs:[], orgs:[], board:{}, runners:[], laps:[], fin:[], pos:[], startTs:0, stopTs:0};
+let S = {cfg:{}, rules:[], clubs:[], orgs:[], board:{}, runners:[], laps:[], fin:[], pos:[], startTs:0, stopTs:0};
 const fmt = ms => { const t=Math.max(0,ms),m=Math.floor(t/60000),s=Math.floor(t%60000/1000),c=Math.floor(t%1000/10); return m+':'+String(s).padStart(2,'0')+'.'+String(c).padStart(2,'0') };
 const gap = ms => ms<60000 ? '+'+(ms/1000).toFixed(1) : '+'+Math.floor(ms/60000)+':'+String(Math.floor(ms%60000/1000)).padStart(2,'0')+'.'+Math.floor(ms%1000/100);
 const elapsed = () => S.startTs ? (S.stopTs || sNow()) - S.startTs : 0;
-const CD = {wxShow:false,wxCity:'',wxX:92,wxY:7,wxS:1,wxO:100,wxTime:true,wxWeather:true,wxSecs:false,wxName:true,opL:100,opR:100,rsO:100,cbO:100,ogO:100,wnO:100,inO:100,inX:50,inY:50,inS:.8,inT:1,introTop:'',introTitle:'',introSub:'',introDate:'',introLine1:'',introLine2:'',introBottom:'',cdShow:false,cdLabel:'До старту',cdEnd:'СТАРТ!',cdTs:0,introAuto:true,theme:'custom',anim:'slide',listShowSec:60,listAuto:true,hideLogos:false,hideMascot:false,tsL:1,tsR:1,rsX:50,rsY:50,rsS:.9,rsT:1,cbX:50,cbY:50,cbS:.9,cbT:1,ogX:50,ogY:50,ogS:.9,ogT:1,wnX:50,wnY:50,wnS:.9,wnT:1,fsShow:false,fsOp:100,fsTop:true,fsColor:'#000000',fsDim:40,fsFit:'fill',fsBlur:0,winnersN:3,lgX1:8.0,lgY1:6,lgS1:1,lgX2:17.4,lgY2:6,lgS2:1,lgX3:26.7,lgY3:6,lgS3:1,lgX4:36.0,lgY4:6,lgS4:1,lgX5:45.4,lgY5:6,lgS5:1,lgX6:54.8,lgY6:6,lgS6:1,lgX7:64.1,lgY7:6,lgS7:1,lgX8:73.5,lgY8:6,lgS8:1,lgX9:82.8,lgY9:6,lgS9:1,lgX10:92.1,lgY10:6,lgS10:1,leadPace:true,leadPaceSec:6,qrShow:false,qrText:'',qrCap:'',qrX:88,qrY:50,qrScale:1,orgTitle:'Організатори забігу',listOpen:true,pageSize:10,pgFirst:30,pgNext:5,bX:50,bY:50,bScale:.9,clubSec:10,flX:50,flY:92,flScale:1,flBg:'#000000',flBgA:0,vX:50,vY:50,vScale:1,vChroma:true,vAuto:true,vKey:'#00ff00',vTol:40,vSoft:20,vUrl:'',dist:10000,firstSeg:0,lap:400,scaleL:1,scaleR:1,lx:40,ly:40,rx:40,ry:40,showL:true,showR:true,bg:'#1b2a6b',acc:'#f5a623',title:'',club:'',logo:''};
+const CD = {rulesTitle:'Регламент змагань',rulesN:8,rulesSec:10,ruX:50,ruY:50,ruS:.8,ruT:1,ruO:100,wxShow:false,wxCity:'',wxX:92,wxY:7,wxS:1,wxO:100,wxTime:true,wxWeather:true,wxSecs:false,wxName:true,opL:100,opR:100,rsO:100,cbO:100,ogO:100,wnO:100,inO:100,inX:50,inY:50,inS:.8,inT:1,introTop:'',introTitle:'',introSub:'',introDate:'',introLine1:'',introLine2:'',introBottom:'',cdShow:false,cdLabel:'До старту',cdEnd:'СТАРТ!',cdTs:0,introAuto:true,theme:'custom',anim:'slide',listShowSec:60,listAuto:true,hideLogos:false,hideMascot:false,tsL:1,tsR:1,rsX:50,rsY:50,rsS:.9,rsT:1,cbX:50,cbY:50,cbS:.9,cbT:1,ogX:50,ogY:50,ogS:.9,ogT:1,wnX:50,wnY:50,wnS:.9,wnT:1,fsShow:false,fsOp:100,fsTop:true,fsColor:'#000000',fsDim:40,fsFit:'fill',fsBlur:0,winnersN:3,lgX1:8.0,lgY1:6,lgS1:1,lgX2:17.4,lgY2:6,lgS2:1,lgX3:26.7,lgY3:6,lgS3:1,lgX4:36.0,lgY4:6,lgS4:1,lgX5:45.4,lgY5:6,lgS5:1,lgX6:54.8,lgY6:6,lgS6:1,lgX7:64.1,lgY7:6,lgS7:1,lgX8:73.5,lgY8:6,lgS8:1,lgX9:82.8,lgY9:6,lgS9:1,lgX10:92.1,lgY10:6,lgS10:1,leadPace:true,leadPaceSec:6,qrShow:false,qrText:'',qrCap:'',qrX:88,qrY:50,qrScale:1,orgTitle:'Організатори забігу',listOpen:true,pageSize:10,pgFirst:30,pgNext:5,bX:50,bY:50,bScale:.9,clubSec:10,flX:50,flY:92,flScale:1,flBg:'#000000',flBgA:0,vX:50,vY:50,vScale:1,vChroma:true,vAuto:true,vKey:'#00ff00',vTol:40,vSoft:20,vUrl:'',dist:10000,firstSeg:0,lap:400,scaleL:1,scaleR:1,lx:40,ly:40,rx:40,ry:40,showL:true,showR:true,bg:'#1b2a6b',acc:'#f5a623',title:'',club:'',logo:''};
 const cfgNow = () => Object.assign({}, CD, S.cfg);
 const covered = (n, c) => n ? Math.min(c.dist, (c.firstSeg || c.lap) + (n - 1) * c.lap) : 0;
 let loaded = false, popT = null;
@@ -200,7 +202,7 @@ const els = {}; let avgKey = null, prevIdx = {};
 onValue(ref(db, 'race/track' + rid), snap => {
   const d = snap.val() || {};
   const prevN = S.laps.length;
-  S = { cfg: d.cfg || {}, runners: d.runners || [], laps: d.laps || [], fin: d.fin || [], pos: d.pos || [], board: d.board || {}, orgs: d.orgs || [], clubs: d.clubs || [], startTs: d.startTs || 0, stopTs: d.stopTs || 0 };
+  S = { cfg: d.cfg || {}, runners: d.runners || [], laps: d.laps || [], fin: d.fin || [], pos: d.pos || [], board: d.board || {}, orgs: d.orgs || [], clubs: d.clubs || [], rules: d.rules || [], startTs: d.startTs || 0, stopTs: d.stopTs || 0 };
   const lapped = loaded && S.laps.length > prevN;
   if (lapped) { openList(); const cc = cfgNow(), sec = cc.leadPaceSec === undefined ? 6 : +cc.leadPaceSec; lpUntil = Date.now() + sec * 1000; clearTimeout(lpT); if (sec > 0) lpT = setTimeout(render, sec * 1000 + 80); }
   render();
@@ -352,11 +354,13 @@ function flagEl(r, c){
   if (src && c.showFlags !== false) { const im = document.createElement('img'); im.src = src; w.appendChild(im); } return w;
 }
 function renderBoard(){
-  const c = cfgNow(), b = (S.board && S.board.mode === 'intro' && cfgNow().introAuto !== false && S.startTs) ? {} : (S.board || {}), B = $('#B'), bi = $('#bi'), pf = { results: 'rs', clubs: 'cb', orgs: 'og', winners: 'wn', intro: 'in' }[b.mode] || 'rs', s = +c[pf + 'S'] || 0, ts = +c[pf + 'T'] || 1;
+  const c = cfgNow(), b = (S.board && S.board.mode === 'intro' && cfgNow().introAuto !== false && S.startTs) ? {} : (S.board || {}), B = $('#B'), bi = $('#bi'), pf = { results: 'rs', clubs: 'cb', orgs: 'og', winners: 'wn', intro: 'in', rules: 'ru' }[b.mode] || 'rs', s = +c[pf + 'S'] || 0, ts = +c[pf + 'T'] || 1;
   if (!b.mode || s <= 0) { B.style.display = 'none'; bKey = ''; bPage = -1; return; }
   B.style.display = 'block'; B.style.left = c[pf + 'X'] * 19.2 + 'px'; B.style.top = c[pf + 'Y'] * 10.8 + 'px'; B.style.transform = 'translate(-50%,-50%) scale(' + s + ')'; bi.style.setProperty('--ts', ts); bi.style.setProperty('--opB', (c[pf + 'O'] ?? 100) / 100);
   const clubs = clubsList(); let page = 0;
   if (b.mode === 'clubs' && clubs.length) page = Math.floor(Math.max(0, sNow() - (b.ts || 0)) / (Math.max(2, +c.clubSec || 10) * 1000)) % clubs.length;
+  const rN0 = Math.max(3, +c.rulesN || 8), rPages0 = Math.max(1, Math.ceil((S.rules || []).length / rN0));
+  if (b.mode === 'rules' && rPages0 > 1) page = Math.floor(Math.max(0, sNow() - (b.ts || 0)) / (Math.max(3, +c.rulesSec || 10) * 1000)) % rPages0;
   const key = b.mode + ':' + (b.ts || 0) + ':' + page, anim = key !== bKey; bKey = key; bPage = page;
   bi.innerHTML = ''; bi.className = anim ? 'anim' : '';
   if (b.mode === 'results') {
@@ -370,6 +374,15 @@ function renderBoard(){
       rw.appendChild(mk('span', 'pn', i + 1)); if (anyF) rw.appendChild(flagEl(x.r, c)); rw.appendChild(mk('span', 'nm', x.r.name));
       if (hasClub) rw.appendChild(mk('span', 'cb', x.r.club || ''));
       rw.appendChild(mk('span', 'r t', x.t != null ? fmt(x.t) : '—')); rw.appendChild(mk('span', 'r t', x.t != null ? paceG(x.t, c.dist) : '—')); bi.appendChild(rw); });
+  } else if (b.mode === 'rules') {
+    const all = (S.rules || []).map(x => String(x || '').trim()).filter(Boolean), N = Math.max(3, +c.rulesN || 8), pages = Math.max(1, Math.ceil(all.length / N));
+    bi.style.setProperty('--rh', 56 * ts + 'px'); bi.style.setProperty('--fs', Math.round(26 * ts) + 'px'); bi.style.setProperty('--cols', Math.round(190 * ts) + 'px 1fr');
+    const hd = mk('div', 'bh'); hd.appendChild(mk('span', '', c.rulesTitle || 'Регламент змагань')); hd.appendChild(mk('small', '', pages > 1 ? (page + 1) + ' / ' + pages : (c.title || ''))); bi.appendChild(hd);
+    if (!all.length) { bi.appendChild(mk('div', 'bc', 'Додайте регламент у пульті')); return; }
+    let num = 0; all.slice(0, page * N).forEach(l => { if (l.indexOf(';') < 0) num++; });
+    all.slice(page * N, page * N + N).forEach((l, i) => { const k = l.indexOf(';'), two = k >= 0, left = two ? l.slice(0, k).trim() : String(++num), right = two ? l.slice(k + 1).trim() : l;
+      const rw = mk('div', 'br rule'); rw.style.animationDelay = i * 80 + 'ms'; rw.appendChild(mk('span', 'rl', left)); rw.appendChild(mk('span', 'nm', right)); bi.appendChild(rw); });
+    if (pages > 1) { const dots = mk('div', 'dots'); for (let i = 0; i < pages; i++) dots.appendChild(mk('i', i === page ? 'on' : '')); bi.appendChild(dots); }
   } else if (b.mode === 'intro') {
     bi.classList.add('intro');
     const T = x => String(x || '').trim(), topT = T(c.introTop), botT = T(c.introBottom), logo = c.hideLogos ? '' : (M.il || c.logo || '');
@@ -509,6 +522,8 @@ addEventListener('resize', fit); fit();
   const b = S.board || {};
   if (b.mode === 'clubs') { const n = clubsList().length;
     if (n) { const p = Math.floor(Math.max(0, sNow() - (b.ts || 0)) / (Math.max(2, +cfgNow().clubSec || 10) * 1000)) % n; if (p !== bPage) renderBoard(); } }
+  if (b.mode === 'rules') { const cc = cfgNow(), n = Math.ceil((S.rules || []).length / Math.max(3, +cc.rulesN || 8));
+    if (n > 1) { const p = Math.floor(Math.max(0, sNow() - (b.ts || 0)) / (Math.max(3, +cc.rulesSec || 10) * 1000)) % n; if (p !== bPage) renderBoard(); } }
   if (listPage(cfgNow()) !== curLP) render();
   const sc = Math.floor(sNow() / 1000); if (sc !== wxSec) { wxSec = sc; updWxTime(cfgNow()); }
   const cvEl = document.getElementById('cdv'); if (cvEl) { const tx = cdText(cfgNow()); if (cvEl.textContent !== tx) cvEl.textContent = tx; }
