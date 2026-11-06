@@ -130,6 +130,29 @@ body[data-anim=zoom] .anim .pc{animation-name:rZoom}
 body[data-anim=bounce] .row.in,body[data-anim=bounce] .anim .br{animation:rBounce .7s ease both}
 body[data-anim=bounce] #bi.anim{animation:rBounce .8s ease both}
 body[data-anim=bounce] .anim .pc{animation-name:rBounce}
+
+.rows,#Rin,#bi{background:transparent;position:relative;isolation:isolate}
+.pop{background:transparent;isolation:isolate}
+.rows::before,#Rin::before,.pop::before,#bi::before{content:'';position:absolute;left:0;top:0;right:0;bottom:0;z-index:-1;background:var(--bg);border-radius:inherit}
+#L .rows::before{opacity:var(--opL,1)}#R #Rin::before,#R .pop::before{opacity:var(--opR,1)}#bi::before{opacity:var(--opB,1)}
+.hd,.avg,.bh,.itop,.ibot{background:transparent;position:relative;isolation:isolate}
+.hd::before,.avg::before,.bh::before,.itop::before,.ibot::before{content:'';position:absolute;left:0;top:0;right:0;bottom:0;z-index:-1;background:var(--acc)}
+#L .hd::before{opacity:var(--opL,1)}#R .hd::before,#R .avg::before{opacity:var(--opR,1)}#bi .bh::before,#bi .itop::before,#bi .ibot::before{opacity:var(--opB,1)}
+#bi.intro{width:1400px}
+.itop,.ibot{color:var(--atx,#111);text-align:center;font:700 26px Oswald;letter-spacing:6px;padding:14px 20px}
+.ibody{display:flex;flex-direction:column;align-items:center;gap:14px;padding:36px 60px;text-align:center}
+.ilg{max-height:200px;max-width:420px;object-fit:contain}
+.ittl{font:700 72px Oswald;line-height:1.05}.isub{font:700 34px Oswald;opacity:.9}
+.idate{font:900 30px Inter;color:var(--acc)}.iline{font:500 26px Oswald;opacity:.85}
+.icd{margin-top:12px;background:rgba(0,0,0,.28);border-radius:16px;padding:14px 44px}
+.icl{font:700 22px Oswald;letter-spacing:4px;opacity:.85}.icv{font:700 96px Oswald;font-variant-numeric:tabular-nums;line-height:1.1}
+#bi .itop,#bi .ibot{font-size:calc(26px*var(--ts,1))}#bi .ittl{font-size:calc(72px*var(--ts,1))}#bi .isub{font-size:calc(34px*var(--ts,1))}
+#bi .idate{font-size:calc(30px*var(--ts,1))}#bi .iline{font-size:calc(26px*var(--ts,1))}#bi .icv{font-size:calc(96px*var(--ts,1))}#bi .icl{font-size:calc(22px*var(--ts,1))}
+.anim .ii{animation:sIn .7s both}
+body[data-anim=center] .anim .ii{animation:rCenter .7s ease both}
+body[data-anim=fade] .anim .ii{animation:rFade .7s ease both}
+body[data-anim=zoom] .anim .ii{animation:rZoom .7s ease both}
+body[data-anim=bounce] .anim .ii{animation:rBounce .7s ease both}
 </style></head><body><div id="FS"><img id="fsimg"><div id="fst"></div></div><div id="stage">
 <div id="FL" class="fx"><img id="fli"></div><div id="MV" class="fx"><video id="mv" muted loop playsinline autoplay></video><canvas id="mc"></canvas></div>
 <div class="box" id="L"><div class="rows" id="rows"></div><div class="hd"><img id="lg"><span id="tt"></span><span class="cl" id="cl"></span></div></div>
@@ -160,7 +183,7 @@ let S = {cfg:{}, clubs:[], orgs:[], board:{}, runners:[], laps:[], fin:[], pos:[
 const fmt = ms => { const t=Math.max(0,ms),m=Math.floor(t/60000),s=Math.floor(t%60000/1000),c=Math.floor(t%1000/10); return m+':'+String(s).padStart(2,'0')+'.'+String(c).padStart(2,'0') };
 const gap = ms => ms<60000 ? '+'+(ms/1000).toFixed(1) : '+'+Math.floor(ms/60000)+':'+String(Math.floor(ms%60000/1000)).padStart(2,'0')+'.'+Math.floor(ms%1000/100);
 const elapsed = () => S.startTs ? (S.stopTs || sNow()) - S.startTs : 0;
-const CD = {theme:'custom',anim:'slide',listShowSec:60,listAuto:true,hideLogos:false,hideMascot:false,tsL:1,tsR:1,rsX:50,rsY:50,rsS:.9,rsT:1,cbX:50,cbY:50,cbS:.9,cbT:1,ogX:50,ogY:50,ogS:.9,ogT:1,wnX:50,wnY:50,wnS:.9,wnT:1,fsShow:false,fsOp:100,fsTop:true,fsColor:'#000000',fsDim:40,fsFit:'fill',fsBlur:0,winnersN:3,lgX1:8.0,lgY1:6,lgS1:1,lgX2:17.4,lgY2:6,lgS2:1,lgX3:26.7,lgY3:6,lgS3:1,lgX4:36.0,lgY4:6,lgS4:1,lgX5:45.4,lgY5:6,lgS5:1,lgX6:54.8,lgY6:6,lgS6:1,lgX7:64.1,lgY7:6,lgS7:1,lgX8:73.5,lgY8:6,lgS8:1,lgX9:82.8,lgY9:6,lgS9:1,lgX10:92.1,lgY10:6,lgS10:1,leadPace:true,leadPaceSec:6,qrShow:false,qrText:'',qrCap:'',qrX:88,qrY:50,qrScale:1,orgTitle:'Організатори забігу',listOpen:true,pageSize:10,pgFirst:30,pgNext:5,bX:50,bY:50,bScale:.9,clubSec:10,flX:50,flY:92,flScale:1,flBg:'#000000',flBgA:0,vX:50,vY:50,vScale:1,vChroma:true,vAuto:true,vKey:'#00ff00',vTol:40,vSoft:20,vUrl:'',dist:10000,firstSeg:0,lap:400,scaleL:1,scaleR:1,lx:40,ly:40,rx:40,ry:40,showL:true,showR:true,bg:'#1b2a6b',acc:'#f5a623',title:'',club:'',logo:''};
+const CD = {opL:100,opR:100,rsO:100,cbO:100,ogO:100,wnO:100,inO:100,inX:50,inY:50,inS:.8,inT:1,introTop:'',introTitle:'',introSub:'',introDate:'',introLine1:'',introLine2:'',introBottom:'',cdShow:false,cdLabel:'До старту',cdEnd:'СТАРТ!',cdTs:0,introAuto:true,theme:'custom',anim:'slide',listShowSec:60,listAuto:true,hideLogos:false,hideMascot:false,tsL:1,tsR:1,rsX:50,rsY:50,rsS:.9,rsT:1,cbX:50,cbY:50,cbS:.9,cbT:1,ogX:50,ogY:50,ogS:.9,ogT:1,wnX:50,wnY:50,wnS:.9,wnT:1,fsShow:false,fsOp:100,fsTop:true,fsColor:'#000000',fsDim:40,fsFit:'fill',fsBlur:0,winnersN:3,lgX1:8.0,lgY1:6,lgS1:1,lgX2:17.4,lgY2:6,lgS2:1,lgX3:26.7,lgY3:6,lgS3:1,lgX4:36.0,lgY4:6,lgS4:1,lgX5:45.4,lgY5:6,lgS5:1,lgX6:54.8,lgY6:6,lgS6:1,lgX7:64.1,lgY7:6,lgS7:1,lgX8:73.5,lgY8:6,lgS8:1,lgX9:82.8,lgY9:6,lgS9:1,lgX10:92.1,lgY10:6,lgS10:1,leadPace:true,leadPaceSec:6,qrShow:false,qrText:'',qrCap:'',qrX:88,qrY:50,qrScale:1,orgTitle:'Організатори забігу',listOpen:true,pageSize:10,pgFirst:30,pgNext:5,bX:50,bY:50,bScale:.9,clubSec:10,flX:50,flY:92,flScale:1,flBg:'#000000',flBgA:0,vX:50,vY:50,vScale:1,vChroma:true,vAuto:true,vKey:'#00ff00',vTol:40,vSoft:20,vUrl:'',dist:10000,firstSeg:0,lap:400,scaleL:1,scaleR:1,lx:40,ly:40,rx:40,ry:40,showL:true,showR:true,bg:'#1b2a6b',acc:'#f5a623',title:'',club:'',logo:''};
 const cfgNow = () => Object.assign({}, CD, S.cfg);
 const covered = (n, c) => n ? Math.min(c.dist, (c.firstSeg || c.lap) + (n - 1) * c.lap) : 0;
 let loaded = false, popT = null;
@@ -222,6 +245,11 @@ function applyTheme(c){
   const v = Object.assign(d, { bg: c.bg, acc: c.acc }, TH[c.theme] || {}), st = document.documentElement.style;
   Object.keys(v).forEach(k => st.setProperty('--' + k, v[k]));
   document.body.dataset.anim = c.anim || 'slide';
+}
+function cdText(c){
+  const ts = +c.cdTs || 0; if (!ts) return ''; const ms = ts - sNow(); if (ms <= 0) return c.cdEnd || 'СТАРТ!';
+  const s = Math.ceil(ms / 1000), d = Math.floor(s / 86400), h = Math.floor(s % 86400 / 3600), m = Math.floor(s % 3600 / 60), x = s % 60, p = n => String(n).padStart(2, '0');
+  return (d ? d + ' дн ' : '') + (d || h ? p(h) + ':' : '') + p(m) + ':' + p(x);
 }
 function openList(){
   const c = cfgNow(); lOpen = true; clearTimeout(lT);
@@ -287,9 +315,9 @@ function flagEl(r, c){
   if (src && c.showFlags !== false) { const im = document.createElement('img'); im.src = src; w.appendChild(im); } return w;
 }
 function renderBoard(){
-  const c = cfgNow(), b = S.board || {}, B = $('#B'), bi = $('#bi'), pf = { results: 'rs', clubs: 'cb', orgs: 'og', winners: 'wn' }[b.mode] || 'rs', s = +c[pf + 'S'] || 0, ts = +c[pf + 'T'] || 1;
+  const c = cfgNow(), b = (S.board && S.board.mode === 'intro' && cfgNow().introAuto !== false && S.startTs) ? {} : (S.board || {}), B = $('#B'), bi = $('#bi'), pf = { results: 'rs', clubs: 'cb', orgs: 'og', winners: 'wn', intro: 'in' }[b.mode] || 'rs', s = +c[pf + 'S'] || 0, ts = +c[pf + 'T'] || 1;
   if (!b.mode || s <= 0) { B.style.display = 'none'; bKey = ''; bPage = -1; return; }
-  B.style.display = 'block'; B.style.left = c[pf + 'X'] * 19.2 + 'px'; B.style.top = c[pf + 'Y'] * 10.8 + 'px'; B.style.transform = 'translate(-50%,-50%) scale(' + s + ')'; bi.style.setProperty('--ts', ts);
+  B.style.display = 'block'; B.style.left = c[pf + 'X'] * 19.2 + 'px'; B.style.top = c[pf + 'Y'] * 10.8 + 'px'; B.style.transform = 'translate(-50%,-50%) scale(' + s + ')'; bi.style.setProperty('--ts', ts); bi.style.setProperty('--opB', (c[pf + 'O'] ?? 100) / 100);
   const clubs = clubsList(); let page = 0;
   if (b.mode === 'clubs' && clubs.length) page = Math.floor(Math.max(0, sNow() - (b.ts || 0)) / (Math.max(2, +c.clubSec || 10) * 1000)) % clubs.length;
   const key = b.mode + ':' + (b.ts || 0) + ':' + page, anim = key !== bKey; bKey = key; bPage = page;
@@ -305,6 +333,18 @@ function renderBoard(){
       rw.appendChild(mk('span', 'pn', i + 1)); if (anyF) rw.appendChild(flagEl(x.r, c)); rw.appendChild(mk('span', 'nm', x.r.name));
       if (hasClub) rw.appendChild(mk('span', 'cb', x.r.club || ''));
       rw.appendChild(mk('span', 'r t', x.t != null ? fmt(x.t) : '—')); rw.appendChild(mk('span', 'r t', x.t != null ? paceG(x.t, c.dist) : '—')); bi.appendChild(rw); });
+  } else if (b.mode === 'intro') {
+    bi.classList.add('intro');
+    const T = x => String(x || '').trim(), topT = T(c.introTop), botT = T(c.introBottom), logo = c.hideLogos ? '' : (M.il || c.logo || '');
+    const body = mk('div', 'ibody'); let k = 0;
+    const add = (cls, txt) => { if (!T(txt)) return; const e = mk('div', 'ii ' + cls, T(txt)); e.style.animationDelay = (k++ * 120) + 'ms'; body.appendChild(e); };
+    if (topT) bi.appendChild(mk('div', 'itop', topT));
+    if (logo) { const im = document.createElement('img'); im.className = 'ii ilg'; im.src = logo; im.style.animationDelay = (k++ * 120) + 'ms'; body.appendChild(im); }
+    add('ittl', c.introTitle); add('isub', c.introSub); add('idate', c.introDate); add('iline', c.introLine1); add('iline', c.introLine2);
+    if (c.cdShow && +c.cdTs > 0) { const cd = mk('div', 'ii icd'), cv = mk('div', 'icv', cdText(c)); cv.id = 'cdv'; cd.style.animationDelay = (k++ * 120) + 'ms'; cd.appendChild(mk('div', 'icl', T(c.cdLabel) || 'До старту')); cd.appendChild(cv); body.appendChild(cd); }
+    if (body.children.length) bi.appendChild(body);
+    if (botT) bi.appendChild(mk('div', 'ibot', botT));
+    if (!topT && !botT && !body.children.length) bi.appendChild(mk('div', 'bh', 'Заповніть вступне табло в пульті'));
   } else if (b.mode === 'winners') {
     const N = Math.max(3, Math.min(4, Math.round(+c.winnersN || 3))), won = ordered().filter(x => x.t != null).slice(0, N);
     const hd = mk('div', 'bh'); hd.appendChild(mk('span', '', 'Переможці · ' + (c.title || ''))); hd.appendChild(mk('small', '', 'Дистанція ' + c.dist + ' м')); bi.appendChild(hd);
@@ -360,7 +400,7 @@ function render(){
   const reanim = (c.showL && prevShowL === false) || (effOpen && prevOpen === false); prevShowL = c.showL; prevOpen = effOpen;
   renderBoard();
   const st = document.documentElement.style;
-  applyTheme(c); st.setProperty('--tsL', c.tsL || 1); st.setProperty('--tsR', c.tsR || 1);
+  applyTheme(c); st.setProperty('--opL', (c.opL ?? 100) / 100); st.setProperty('--opR', (c.opR ?? 100) / 100); st.setProperty('--tsL', c.tsL || 1); st.setProperty('--tsR', c.tsR || 1);
   ['lx','ly','rx','ry'].forEach(k => st.setProperty('--'+k, c[k]+'px'));
   $('#L').style.scale = c.scaleL; $('#R').style.scale = c.scaleR;
   $('#L').classList.toggle('off', !c.showL); $('#R').classList.toggle('off', !c.showR);
@@ -433,6 +473,7 @@ addEventListener('resize', fit); fit();
   if (b.mode === 'clubs') { const n = clubsList().length;
     if (n) { const p = Math.floor(Math.max(0, sNow() - (b.ts || 0)) / (Math.max(2, +cfgNow().clubSec || 10) * 1000)) % n; if (p !== bPage) renderBoard(); } }
   if (listPage(cfgNow()) !== curLP) render();
+  const cvEl = document.getElementById('cdv'); if (cvEl) { const tx = cdText(cfgNow()); if (cvEl.textContent !== tx) cvEl.textContent = tx; }
   requestAnimationFrame(tick);
 })();
 </script></body></html>
