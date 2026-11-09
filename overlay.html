@@ -6,7 +6,7 @@
 :root{--bg:rgba(27,42,107,.92);--acc:#f5a623;--lx:40px;--ly:40px;--rx:40px;--ry:40px}
 html,body{margin:0;width:100vw;height:100vh;background:transparent;overflow:hidden;color:#fff;font-family:'Oswald',sans-serif;text-transform:uppercase}
 .box{position:absolute;transition:opacity .5s,transform .6s cubic-bezier(.2,.8,.2,1)}
-.PL{left:var(--lx);bottom:var(--ly);width:400px;transform-origin:bottom left}
+.PL{left:var(--lx);bottom:var(--ly);width:480px;transform-origin:bottom left}
 .PR{right:var(--rx);bottom:var(--ry);width:320px;transform-origin:bottom right}
 .off{opacity:0;pointer-events:none}
 .PL.off{translate:-80px 0}.PR.off{translate:80px 0}
@@ -177,6 +177,8 @@ body[data-anim=bounce] .anim .ii{animation:rBounce .7s ease both}
 .CP .cph{position:relative;isolation:isolate;padding:8px 18px;font-weight:700;font-size:calc(30px*var(--cpt,1));color:var(--atx,#111)}
 .CP .cph::before{content:'';position:absolute;left:0;top:0;right:0;bottom:0;z-index:-1;background:var(--acc);opacity:var(--cpo,1)}
 .CP .cpx{padding:12px 18px;font-size:calc(26px*var(--cpt,1));line-height:1.25;white-space:pre-line;overflow-wrap:anywhere}
+.row .g{white-space:nowrap;flex-shrink:0}
+.row .g small{font:600 .72em Inter;opacity:.85;margin-left:8px}
 </style></head><body><div id="FS"><img id="fsimg"><div id="fst"></div></div><div id="stage">
 <div id="FL" class="fx"><img id="fli"></div><div id="MV" class="fx"><video id="mv" muted loop playsinline autoplay></video><canvas id="mc"></canvas></div>
 <div id="WX" class="fx"><div class="wxt" id="wxt"></div><div class="wxm" id="wxm"><span class="wxi" id="wxI"></span><span class="wxd"><b id="wxT"></b><small id="wxD"></small></span></div></div>
@@ -207,7 +209,7 @@ const HT = Array.from({ length: MAXH }, () => ({ hc:{}, runners:[], laps:[], fin
 let S = { cfg:{}, board:{}, orgs:[], rules:[], clubs:[], runners:[], fin:[], pos:[], startTs:0 };
 const fmt = ms => { const t=Math.max(0,ms),m=Math.floor(t/60000),s=Math.floor(t%60000/1000),c=Math.floor(t%1000/10); return m+':'+String(s).padStart(2,'0')+'.'+String(c).padStart(2,'0') };
 const gap = ms => ms<60000 ? '+'+(ms/1000).toFixed(1) : '+'+Math.floor(ms/60000)+':'+String(Math.floor(ms%60000/1000)).padStart(2,'0')+'.'+Math.floor(ms%1000/100);
-const CD = {cxOn1:false,cxHead1:'',cxBody1:'',cxFont1:'Oswald',cxX1:3,cxY1:86,cxS1:1,cxT1:1,cxW1:760,cxO1:100,cxOn2:false,cxHead2:'',cxBody2:'',cxFont2:'Oswald',cxX2:3,cxY2:68,cxS2:1,cxT2:1,cxW2:760,cxO2:100,cxOn3:false,cxHead3:'',cxBody3:'',cxFont3:'Oswald',cxX3:3,cxY3:50,cxS3:1,cxT3:1,cxW3:760,cxO3:100,air:true,lgOn1:true,lgCk1:false,lgAuto1:true,lgKey1:'#ffffff',lgTol1:30,lgSoft1:15,lgOn2:true,lgCk2:false,lgAuto2:true,lgKey2:'#ffffff',lgTol2:30,lgSoft2:15,lgOn3:true,lgCk3:false,lgAuto3:true,lgKey3:'#ffffff',lgTol3:30,lgSoft3:15,lgOn4:true,lgCk4:false,lgAuto4:true,lgKey4:'#ffffff',lgTol4:30,lgSoft4:15,lgOn5:true,lgCk5:false,lgAuto5:true,lgKey5:'#ffffff',lgTol5:30,lgSoft5:15,lgOn6:true,lgCk6:false,lgAuto6:true,lgKey6:'#ffffff',lgTol6:30,lgSoft6:15,lgOn7:true,lgCk7:false,lgAuto7:true,lgKey7:'#ffffff',lgTol7:30,lgSoft7:15,lgOn8:true,lgCk8:false,lgAuto8:true,lgKey8:'#ffffff',lgTol8:30,lgSoft8:15,lgOn9:true,lgCk9:false,lgAuto9:true,lgKey9:'#ffffff',lgTol9:30,lgSoft9:15,lgOn10:true,lgCk10:false,lgAuto10:true,lgKey10:'#ffffff',lgTol10:30,lgSoft10:15,rsW:1100,cbW:1100,ogW:1100,wnW:1100,ruW:1100,inW:1400,winManual:false,hname:'',bScope:'all',rulesTitle:'Регламент змагань',rulesN:8,rulesSec:10,ruX:50,ruY:50,ruS:.8,ruT:1,ruO:100,wxShow:false,wxCity:'',wxX:92,wxY:7,wxS:1,wxO:100,wxTime:true,wxWeather:true,wxSecs:false,wxName:true,opL:100,opR:100,rsO:100,cbO:100,ogO:100,wnO:100,inO:100,inX:50,inY:50,inS:.8,inT:1,introTop:'',introTitle:'',introSub:'',introDate:'',introLine1:'',introLine2:'',introBottom:'',cdShow:false,cdLabel:'До старту',cdEnd:'СТАРТ!',cdTs:0,introAuto:true,theme:'custom',anim:'slide',listShowSec:60,listAuto:true,hideLogos:false,hideMascot:false,tsL:1,tsR:1,rsX:50,rsY:50,rsS:.9,rsT:1,cbX:50,cbY:50,cbS:.9,cbT:1,ogX:50,ogY:50,ogS:.9,ogT:1,wnX:50,wnY:50,wnS:.9,wnT:1,fsShow:false,fsOp:100,fsTop:true,fsColor:'#000000',fsDim:40,fsFit:'fill',fsBlur:0,winnersN:3,lgX1:8.0,lgY1:6,lgS1:1,lgX2:17.4,lgY2:6,lgS2:1,lgX3:26.7,lgY3:6,lgS3:1,lgX4:36.0,lgY4:6,lgS4:1,lgX5:45.4,lgY5:6,lgS5:1,lgX6:54.8,lgY6:6,lgS6:1,lgX7:64.1,lgY7:6,lgS7:1,lgX8:73.5,lgY8:6,lgS8:1,lgX9:82.8,lgY9:6,lgS9:1,lgX10:92.1,lgY10:6,lgS10:1,leadPace:true,leadPaceSec:6,qrShow:false,qrText:'',qrCap:'',qrX:88,qrY:50,qrScale:1,orgTitle:'Організатори забігу',listOpen:true,pageSize:10,pgFirst:30,pgNext:5,bX:50,bY:50,bScale:.9,clubSec:10,flX:50,flY:92,flScale:1,flBg:'#000000',flBgA:0,vX:50,vY:50,vScale:1,vChroma:true,vAuto:true,vKey:'#00ff00',vTol:40,vSoft:20,vUrl:'',dist:10000,firstSeg:0,lap:400,scaleL:1,scaleR:1,lx:40,ly:40,rx:40,ry:40,showL:true,showR:true,bg:'#1b2a6b',acc:'#f5a623',title:'',club:'',logo:''};
+const CD = {finGapSec:3,finHide:true,finHideSec:10,cxOn1:false,cxHead1:'',cxBody1:'',cxFont1:'Oswald',cxX1:3,cxY1:86,cxS1:1,cxT1:1,cxW1:760,cxO1:100,cxOn2:false,cxHead2:'',cxBody2:'',cxFont2:'Oswald',cxX2:3,cxY2:68,cxS2:1,cxT2:1,cxW2:760,cxO2:100,cxOn3:false,cxHead3:'',cxBody3:'',cxFont3:'Oswald',cxX3:3,cxY3:50,cxS3:1,cxT3:1,cxW3:760,cxO3:100,air:true,lgOn1:true,lgCk1:false,lgAuto1:true,lgKey1:'#ffffff',lgTol1:30,lgSoft1:15,lgOn2:true,lgCk2:false,lgAuto2:true,lgKey2:'#ffffff',lgTol2:30,lgSoft2:15,lgOn3:true,lgCk3:false,lgAuto3:true,lgKey3:'#ffffff',lgTol3:30,lgSoft3:15,lgOn4:true,lgCk4:false,lgAuto4:true,lgKey4:'#ffffff',lgTol4:30,lgSoft4:15,lgOn5:true,lgCk5:false,lgAuto5:true,lgKey5:'#ffffff',lgTol5:30,lgSoft5:15,lgOn6:true,lgCk6:false,lgAuto6:true,lgKey6:'#ffffff',lgTol6:30,lgSoft6:15,lgOn7:true,lgCk7:false,lgAuto7:true,lgKey7:'#ffffff',lgTol7:30,lgSoft7:15,lgOn8:true,lgCk8:false,lgAuto8:true,lgKey8:'#ffffff',lgTol8:30,lgSoft8:15,lgOn9:true,lgCk9:false,lgAuto9:true,lgKey9:'#ffffff',lgTol9:30,lgSoft9:15,lgOn10:true,lgCk10:false,lgAuto10:true,lgKey10:'#ffffff',lgTol10:30,lgSoft10:15,rsW:1100,cbW:1100,ogW:1100,wnW:1100,ruW:1100,inW:1400,winManual:false,hname:'',bScope:'all',rulesTitle:'Регламент змагань',rulesN:8,rulesSec:10,ruX:50,ruY:50,ruS:.8,ruT:1,ruO:100,wxShow:false,wxCity:'',wxX:92,wxY:7,wxS:1,wxO:100,wxTime:true,wxWeather:true,wxSecs:false,wxName:true,opL:100,opR:100,rsO:100,cbO:100,ogO:100,wnO:100,inO:100,inX:50,inY:50,inS:.8,inT:1,introTop:'',introTitle:'',introSub:'',introDate:'',introLine1:'',introLine2:'',introBottom:'',cdShow:false,cdLabel:'До старту',cdEnd:'СТАРТ!',cdTs:0,introAuto:true,theme:'custom',anim:'slide',listShowSec:60,listAuto:true,hideLogos:false,hideMascot:false,tsL:1,tsR:1,rsX:50,rsY:50,rsS:.9,rsT:1,cbX:50,cbY:50,cbS:.9,cbT:1,ogX:50,ogY:50,ogS:.9,ogT:1,wnX:50,wnY:50,wnS:.9,wnT:1,fsShow:false,fsOp:100,fsTop:true,fsColor:'#000000',fsDim:40,fsFit:'fill',fsBlur:0,winnersN:3,lgX1:8.0,lgY1:6,lgS1:1,lgX2:17.4,lgY2:6,lgS2:1,lgX3:26.7,lgY3:6,lgS3:1,lgX4:36.0,lgY4:6,lgS4:1,lgX5:45.4,lgY5:6,lgS5:1,lgX6:54.8,lgY6:6,lgS6:1,lgX7:64.1,lgY7:6,lgS7:1,lgX8:73.5,lgY8:6,lgS8:1,lgX9:82.8,lgY9:6,lgS9:1,lgX10:92.1,lgY10:6,lgS10:1,leadPace:true,leadPaceSec:6,qrShow:false,qrText:'',qrCap:'',qrX:88,qrY:50,qrScale:1,orgTitle:'Організатори забігу',listOpen:true,pageSize:10,pgFirst:30,pgNext:5,bX:50,bY:50,bScale:.9,clubSec:10,flX:50,flY:92,flScale:1,flBg:'#000000',flBgA:0,vX:50,vY:50,vScale:1,vChroma:true,vAuto:true,vKey:'#00ff00',vTol:40,vSoft:20,vUrl:'',dist:10000,firstSeg:0,lap:400,scaleL:1,scaleR:1,lx:40,ly:40,rx:40,ry:40,showL:true,showR:true,bg:'#1b2a6b',acc:'#f5a623',title:'',club:'',logo:''};
 const HD = i => ({ lx: 40, ly: 40, rx: 40, ry: 40, air: i === 0 });
 const cfgNow = () => Object.assign({}, CD, S.cfg);
 const cfgFor = i => Object.assign({}, CD, MN.cfg, HD(i), HT[i].hc);
@@ -544,7 +546,12 @@ class Panel {
   }
   render(){
     const c = this.c(), H = this.H, L = this.L, R = this.R, i = this.i; this.cache = c;
-    const hasR = H.runners.length > 0, showL = c.showL !== false && hasR && c.air !== false, showR = c.showR !== false && hasR && c.air !== false;
+    const hasR = H.runners.length > 0, allDone = hasR && H.fin.length >= H.runners.length;
+    if (allDone) { if (this.doneAt == null) this.doneAt = this.loaded ? Date.now() : 0; } else this.doneAt = null;
+    const hideSec = c.finHideSec === undefined ? 10 : +c.finHideSec, hideOn = c.finHide !== false && allDone;
+    const hidden = hideOn && (this.doneAt === 0 || Date.now() - this.doneAt >= hideSec * 1000);
+    if (hideOn && !hidden) { clearTimeout(this.dT); this.dT = setTimeout(() => this.render(), hideSec * 1000 - (Date.now() - this.doneAt) + 60); }
+    const showL = c.showL !== false && hasR && c.air !== false && !hidden, showR = c.showR !== false && hasR && c.air !== false && !hidden;
     const co = c.listOpen !== false;
     if (this.prevCfgOpen !== co) { if (co) this.openList(); else { this.lOpen = false; clearTimeout(this.lT); } this.prevCfgOpen = co; }
     if (showL && this.prevShowL === false && co) this.openList();
@@ -589,7 +596,14 @@ class Panel {
       e.children[1].style.display = (c.showFlags === false || !anyFlag) ? 'none' : '';
       e.children[0].textContent = k + 1; const nn = e.children[2]; nn.firstChild.textContent = r.name; nn.lastChild.textContent = (r.num === '' || r.num == null) ? '' : String(r.num);
       const gEl = e.children[3];
-      gEl.textContent = f ? (f === lead ? fmt(f.t) : gap(f.t - lead.t)) : (e._mv === 'up' ? '▲' : e._mv === 'dn' ? '▼' : '');
+      if (f) {
+        if (e._finAt === undefined) e._finAt = this.loaded ? Date.now() : 0;
+        const gapSec = c.finGapSec === undefined ? 3 : +c.finGapSec, wait = f === lead ? 0 : gapSec * 1000 - (Date.now() - e._finAt);
+        let key, tx, pc = '';
+        if (wait > 0) { key = 'g' + f.t; tx = gap(f.t - lead.t); clearTimeout(e._gt); e._gt = setTimeout(() => this.render(), wait + 60); }
+        else { key = 't' + f.t; tx = fmt(f.t); pc = paceG(f.t, c.dist); }
+        if (gEl._k !== key) { gEl._k = key; gEl.textContent = tx; if (pc) { const sm = document.createElement('small'); sm.textContent = pc; gEl.appendChild(sm); } }
+      } else { e._finAt = undefined; gEl._k = ''; gEl.textContent = (e._mv === 'up' ? '▲' : e._mv === 'dn' ? '▼' : ''); }
       const isLP = !!lpTxt && leadRun && r.id === leadRun.id && !f;
       if (isLP) { gEl.textContent = lpTxt; if (e._lpKey !== nLaps) { e._lpKey = nLaps; gEl.classList.remove('lpa'); void gEl.offsetWidth; gEl.classList.add('lpa'); } }
       else { e._lpKey = -1; gEl.classList.remove('lpa'); }
