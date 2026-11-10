@@ -179,6 +179,8 @@ body[data-anim=bounce] .anim .ii{animation:rBounce .7s ease both}
 .CP .cpx{padding:12px 18px;font-size:calc(26px*var(--cpt,1));line-height:1.25;white-space:pre-line;overflow-wrap:anywhere}
 .row .g{white-space:nowrap;flex-shrink:0}
 .row .g small{font:600 .72em Inter;opacity:.85;margin-left:8px}
+.prg{margin-top:4px;background:rgba(255,255,255,.25);border-radius:4px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.4)}
+.prg i{display:block;height:100%;width:0;background:var(--acc);border-radius:4px}
 </style></head><body><div id="FS"><img id="fsimg"><div id="fst"></div></div><div id="stage">
 <div id="FL" class="fx"><img id="fli"></div><div id="MV" class="fx"><video id="mv" muted loop playsinline autoplay></video><canvas id="mc"></canvas></div>
 <div id="WX" class="fx"><div class="wxt" id="wxt"></div><div class="wxm" id="wxm"><span class="wxi" id="wxI"></span><span class="wxd"><b id="wxT"></b><small id="wxD"></small></span></div></div>
@@ -209,7 +211,7 @@ const HT = Array.from({ length: MAXH }, () => ({ hc:{}, runners:[], laps:[], fin
 let S = { cfg:{}, board:{}, orgs:[], rules:[], clubs:[], runners:[], fin:[], pos:[], startTs:0 };
 const fmt = ms => { const t=Math.max(0,ms),m=Math.floor(t/60000),s=Math.floor(t%60000/1000),c=Math.floor(t%1000/10); return m+':'+String(s).padStart(2,'0')+'.'+String(c).padStart(2,'0') };
 const gap = ms => ms<60000 ? '+'+(ms/1000).toFixed(1) : '+'+Math.floor(ms/60000)+':'+String(Math.floor(ms%60000/1000)).padStart(2,'0')+'.'+Math.floor(ms%1000/100);
-const CD = {finGapSec:3,finHide:true,finHideSec:10,cxOn1:false,cxHead1:'',cxBody1:'',cxFont1:'Oswald',cxX1:3,cxY1:86,cxS1:1,cxT1:1,cxW1:760,cxO1:100,cxOn2:false,cxHead2:'',cxBody2:'',cxFont2:'Oswald',cxX2:3,cxY2:68,cxS2:1,cxT2:1,cxW2:760,cxO2:100,cxOn3:false,cxHead3:'',cxBody3:'',cxFont3:'Oswald',cxX3:3,cxY3:50,cxS3:1,cxT3:1,cxW3:760,cxO3:100,air:true,lgOn1:true,lgCk1:false,lgAuto1:true,lgKey1:'#ffffff',lgTol1:30,lgSoft1:15,lgOn2:true,lgCk2:false,lgAuto2:true,lgKey2:'#ffffff',lgTol2:30,lgSoft2:15,lgOn3:true,lgCk3:false,lgAuto3:true,lgKey3:'#ffffff',lgTol3:30,lgSoft3:15,lgOn4:true,lgCk4:false,lgAuto4:true,lgKey4:'#ffffff',lgTol4:30,lgSoft4:15,lgOn5:true,lgCk5:false,lgAuto5:true,lgKey5:'#ffffff',lgTol5:30,lgSoft5:15,lgOn6:true,lgCk6:false,lgAuto6:true,lgKey6:'#ffffff',lgTol6:30,lgSoft6:15,lgOn7:true,lgCk7:false,lgAuto7:true,lgKey7:'#ffffff',lgTol7:30,lgSoft7:15,lgOn8:true,lgCk8:false,lgAuto8:true,lgKey8:'#ffffff',lgTol8:30,lgSoft8:15,lgOn9:true,lgCk9:false,lgAuto9:true,lgKey9:'#ffffff',lgTol9:30,lgSoft9:15,lgOn10:true,lgCk10:false,lgAuto10:true,lgKey10:'#ffffff',lgTol10:30,lgSoft10:15,rsW:1100,cbW:1100,ogW:1100,wnW:1100,ruW:1100,inW:1400,winManual:false,hname:'',bScope:'all',rulesTitle:'Регламент змагань',rulesN:8,rulesSec:10,ruX:50,ruY:50,ruS:.8,ruT:1,ruO:100,wxShow:false,wxCity:'',wxX:92,wxY:7,wxS:1,wxO:100,wxTime:true,wxWeather:true,wxSecs:false,wxName:true,opL:100,opR:100,rsO:100,cbO:100,ogO:100,wnO:100,inO:100,inX:50,inY:50,inS:.8,inT:1,introTop:'',introTitle:'',introSub:'',introDate:'',introLine1:'',introLine2:'',introBottom:'',cdShow:false,cdLabel:'До старту',cdEnd:'СТАРТ!',cdTs:0,introAuto:true,theme:'custom',anim:'slide',listShowSec:60,listAuto:true,hideLogos:false,hideMascot:false,tsL:1,tsR:1,rsX:50,rsY:50,rsS:.9,rsT:1,cbX:50,cbY:50,cbS:.9,cbT:1,ogX:50,ogY:50,ogS:.9,ogT:1,wnX:50,wnY:50,wnS:.9,wnT:1,fsShow:false,fsOp:100,fsTop:true,fsColor:'#000000',fsDim:40,fsFit:'fill',fsBlur:0,winnersN:3,lgX1:8.0,lgY1:6,lgS1:1,lgX2:17.4,lgY2:6,lgS2:1,lgX3:26.7,lgY3:6,lgS3:1,lgX4:36.0,lgY4:6,lgS4:1,lgX5:45.4,lgY5:6,lgS5:1,lgX6:54.8,lgY6:6,lgS6:1,lgX7:64.1,lgY7:6,lgS7:1,lgX8:73.5,lgY8:6,lgS8:1,lgX9:82.8,lgY9:6,lgS9:1,lgX10:92.1,lgY10:6,lgS10:1,leadPace:true,leadPaceSec:6,qrShow:false,qrText:'',qrCap:'',qrX:88,qrY:50,qrScale:1,orgTitle:'Організатори забігу',listOpen:true,pageSize:10,pgFirst:30,pgNext:5,bX:50,bY:50,bScale:.9,clubSec:10,flX:50,flY:92,flScale:1,flBg:'#000000',flBgA:0,vX:50,vY:50,vScale:1,vChroma:true,vAuto:true,vKey:'#00ff00',vTol:40,vSoft:20,vUrl:'',dist:10000,firstSeg:0,lap:400,scaleL:1,scaleR:1,lx:40,ly:40,rx:40,ry:40,showL:true,showR:true,bg:'#1b2a6b',acc:'#f5a623',title:'',club:'',logo:''};
+const CD = {prgOn:true,prgH:5,finGapSec:3,finHide:true,finHideSec:10,cxOn1:false,cxHead1:'',cxBody1:'',cxFont1:'Oswald',cxX1:3,cxY1:86,cxS1:1,cxT1:1,cxW1:760,cxO1:100,cxOn2:false,cxHead2:'',cxBody2:'',cxFont2:'Oswald',cxX2:3,cxY2:68,cxS2:1,cxT2:1,cxW2:760,cxO2:100,cxOn3:false,cxHead3:'',cxBody3:'',cxFont3:'Oswald',cxX3:3,cxY3:50,cxS3:1,cxT3:1,cxW3:760,cxO3:100,air:true,lgOn1:true,lgCk1:false,lgAuto1:true,lgKey1:'#ffffff',lgTol1:30,lgSoft1:15,lgOn2:true,lgCk2:false,lgAuto2:true,lgKey2:'#ffffff',lgTol2:30,lgSoft2:15,lgOn3:true,lgCk3:false,lgAuto3:true,lgKey3:'#ffffff',lgTol3:30,lgSoft3:15,lgOn4:true,lgCk4:false,lgAuto4:true,lgKey4:'#ffffff',lgTol4:30,lgSoft4:15,lgOn5:true,lgCk5:false,lgAuto5:true,lgKey5:'#ffffff',lgTol5:30,lgSoft5:15,lgOn6:true,lgCk6:false,lgAuto6:true,lgKey6:'#ffffff',lgTol6:30,lgSoft6:15,lgOn7:true,lgCk7:false,lgAuto7:true,lgKey7:'#ffffff',lgTol7:30,lgSoft7:15,lgOn8:true,lgCk8:false,lgAuto8:true,lgKey8:'#ffffff',lgTol8:30,lgSoft8:15,lgOn9:true,lgCk9:false,lgAuto9:true,lgKey9:'#ffffff',lgTol9:30,lgSoft9:15,lgOn10:true,lgCk10:false,lgAuto10:true,lgKey10:'#ffffff',lgTol10:30,lgSoft10:15,rsW:1100,cbW:1100,ogW:1100,wnW:1100,ruW:1100,inW:1400,winManual:false,hname:'',bScope:'all',rulesTitle:'Регламент змагань',rulesN:8,rulesSec:10,ruX:50,ruY:50,ruS:.8,ruT:1,ruO:100,wxShow:false,wxCity:'',wxX:92,wxY:7,wxS:1,wxO:100,wxTime:true,wxWeather:true,wxSecs:false,wxName:true,opL:100,opR:100,rsO:100,cbO:100,ogO:100,wnO:100,inO:100,inX:50,inY:50,inS:.8,inT:1,introTop:'',introTitle:'',introSub:'',introDate:'',introLine1:'',introLine2:'',introBottom:'',cdShow:false,cdLabel:'До старту',cdEnd:'СТАРТ!',cdTs:0,introAuto:true,theme:'custom',anim:'slide',listShowSec:60,listAuto:true,hideLogos:false,hideMascot:false,tsL:1,tsR:1,rsX:50,rsY:50,rsS:.9,rsT:1,cbX:50,cbY:50,cbS:.9,cbT:1,ogX:50,ogY:50,ogS:.9,ogT:1,wnX:50,wnY:50,wnS:.9,wnT:1,fsShow:false,fsOp:100,fsTop:true,fsColor:'#000000',fsDim:40,fsFit:'fill',fsBlur:0,winnersN:3,lgX1:8.0,lgY1:6,lgS1:1,lgX2:17.4,lgY2:6,lgS2:1,lgX3:26.7,lgY3:6,lgS3:1,lgX4:36.0,lgY4:6,lgS4:1,lgX5:45.4,lgY5:6,lgS5:1,lgX6:54.8,lgY6:6,lgS6:1,lgX7:64.1,lgY7:6,lgS7:1,lgX8:73.5,lgY8:6,lgS8:1,lgX9:82.8,lgY9:6,lgS9:1,lgX10:92.1,lgY10:6,lgS10:1,leadPace:true,leadPaceSec:6,qrShow:false,qrText:'',qrCap:'',qrX:88,qrY:50,qrScale:1,orgTitle:'Організатори забігу',listOpen:true,pageSize:10,pgFirst:30,pgNext:5,bX:50,bY:50,bScale:.9,clubSec:10,flX:50,flY:92,flScale:1,flBg:'#000000',flBgA:0,vX:50,vY:50,vScale:1,vChroma:true,vAuto:true,vKey:'#00ff00',vTol:40,vSoft:20,vUrl:'',dist:10000,firstSeg:0,lap:400,scaleL:1,scaleR:1,lx:40,ly:40,rx:40,ry:40,showL:true,showR:true,bg:'#1b2a6b',acc:'#f5a623',title:'',club:'',logo:''};
 const HD = i => ({ lx: 40, ly: 40, rx: 40, ry: 40, air: i === 0 });
 const cfgNow = () => Object.assign({}, CD, S.cfg);
 const cfgFor = i => Object.assign({}, CD, MN.cfg, HD(i), HT[i].hc);
@@ -506,12 +508,12 @@ class Panel {
     this.lOpen = true; this.lT = null; this.lpUntil = 0; this.lpT = null; this.curLP = 0; this.nList = 0; this.anchor0 = sNow(); this.popT = null; this.loaded = false;
     const st = $('#stage');
     this.L = document.createElement('div'); this.L.className = 'box PL off';
-    this.L.innerHTML = '<div class="rows"></div><div class="hd"><img class="lg"><span class="tt"></span><span class="cl"></span></div>';
+    this.L.innerHTML = '<div class="rows"></div><div class="hd"><img class="lg"><span class="tt"></span><span class="cl"></span></div><div class="prg"><i></i></div>';
     this.R = document.createElement('div'); this.R.className = 'box PR off';
     this.R.innerHTML = '<div class="pop"><div class="pr"><span>⟲ КОЛО</span><b class="pl2"></b></div><div class="pr pm pdv"></div><div class="pr last"><span class="pgv"></span><b class="pev"></b></div></div>' +
       '<div class="Rin"><div class="avgw"></div><div class="dt">' + [['d1','Останнє коло'],['d2','Серед. швидкість'],['d3','Серед. темп'],['d4','Темп кола']].map(a => '<div class="dr ' + a[0] + '"><div class="sm"><span>' + a[1] + '</span><b></b></div></div>').join('') +
       '</div><div class="rp"><div class="big tm">0:00</div></div><div class="hd"><span class="rt">ЧАС</span><span class="cl lapn"></span></div></div>';
-    st.appendChild(this.L); st.appendChild(this.R); this.rows = this.L.querySelector('.rows');
+    st.appendChild(this.L); st.appendChild(this.R); this.rows = this.L.querySelector('.rows'); this.prg = this.L.querySelector('.prg'); this.prgI = this.prg.firstChild; this._pw = -1;
   }
   q(s){ return this.R.querySelector(s); }
   c(){ return cfgFor(this.i); }
@@ -542,6 +544,7 @@ class Panel {
   tick(){
     const H = this.H; if (!H.runners.length) return;
     const tx = H.startTs ? fmt(elapsedH(H)) : '0:00', tm = this.q('.tm'); if (tm.textContent !== tx) tm.textContent = tx;
+    if (this.cache) { const w = Math.round(this.progress(this.cache) * 10000) / 100; if (w !== this._pw) { this._pw = w; this.prgI.style.width = w + '%'; } }
     if (this.cache && this.listPage(this.cache, this.nList) !== this.curLP) this.render();
   }
   render(){
@@ -565,6 +568,7 @@ class Panel {
     L.querySelector('.cl').textContent = c.club || '';
     this.q('.rt').textContent = multi ? 'ЧАС · ' + (i + 1) : 'ЧАС';
     const lg = L.querySelector('.lg'), hl = c.logo && !c.hideLogos; lg.style.display = hl ? '' : 'none'; if (hl) lg.src = c.logo;
+    this.prg.style.display = c.prgOn === false ? 'none' : ''; this.prg.style.height = (+c.prgH || 5) + 'px';
     const fin = H.fin, ids = new Set(H.runners.map(r => r.id));
     const pids = H.pos.filter(id => ids.has(id)), live = pids.map(id => H.runners.find(r => r.id === id)).concat(H.runners.filter(r => !pids.includes(r.id)));
     const list = fin.map(f => H.runners.find(r => r.id === f.id)).filter(Boolean).concat(live.filter(r => !fin.some(f => f.id === r.id)));
@@ -628,6 +632,13 @@ class Panel {
       if (t > 0 && cov > 0) { sp = (cov / (t / 1000) * 3.6).toFixed(1) + ' км/год'; pc = paceG(t, cov); }
       if (lt > 0 && ld > 0) lpc = paceG(lt, ld); }
     setD('d4', lpc, 0); setD('d3', pc, 1); setD('d2', sp, 2); setD('d1', ll, 3);
+  }
+  progress(c){
+    const H = this.H, n = H.laps.length; if (!H.startTs) return 0; if (H.fin.length) return 1; if (!n || !(c.dist > 0)) return 0;
+    const cov = covered(n, c), t = H.laps[n - 1], lt = t - (H.laps[n - 2] || 0), ld = cov - covered(n - 1, c);
+    let est = cov;
+    if (lt > 0 && ld > 0) { est = cov + Math.max(0, elapsedH(H) - t) * (ld / lt); est = Math.min(est, covered(n + 1, c) || c.dist); }
+    return Math.max(0, Math.min(1, est / c.dist));
   }
   avgPace(c){ const n = this.H.laps.length; if (!n) return null; const t = this.H.laps[n - 1], cov = covered(n, c); return t > 0 && cov > 0 ? paceG(t, cov) : null; }
 }
